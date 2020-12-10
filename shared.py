@@ -4,7 +4,9 @@ Contains functions shared by both standard & modified MOGP.
 Written by Asher Stout, 300432820
 """
 from sklearn.metrics import mean_squared_error
-import numpy as np
+from deap import gp
+import matplotlib.pyplot as plot
+import networkx # used for plotting trees
 
 
 def protected_division(x, y):
@@ -36,5 +38,28 @@ def eval_solution(function, tb, data, actual):
     """
     func = tb.compile(expr=function)
     results = [func(*res) for res in data]
-    acc = mean_squared_error(actual, results)
-    return acc, function.height,
+
+    accuracy = mean_squared_error(actual, results)
+    complexity = function.height
+    return accuracy, complexity,
+
+
+def draw_solution(individual):
+    """
+    Displays a connected tree representing an individual. Presumably this individual scores highly in the population
+    using the method eval_solution.
+
+    :param individual: the individual (represented as a tree) to draw
+    :return:
+    """
+    graph = networkx.Graph()
+    node, edge, label = gp.graph(individual)
+    graph.add_edges_from(edge)
+    graph.add_nodes_from(node)
+
+    pos = networkx.graphviz_layout(graph, prog="dot")
+    networkx.draw_networkx_nodes(graph, pos)
+    networkx.draw_networkx_edges(graph, pos)
+    networkx.draw_networkx_labels(graph, pos, label)
+    plot.show()
+    return

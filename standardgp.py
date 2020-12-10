@@ -9,7 +9,6 @@ import operator as op
 import random as rand
 import pandas
 import numpy
-import networkx
 
 
 def create_primitives(attrs=1):
@@ -32,6 +31,7 @@ def create_primitives(attrs=1):
 def create_definitions(tb, pset):
     """
     Initializes a variety of parameters using the DEAP creator & toolbox
+    
     :param tb: reference to the DEAP toolbox
     :param pset: the primitive set
     :return:
