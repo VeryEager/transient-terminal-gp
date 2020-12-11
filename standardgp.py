@@ -4,11 +4,11 @@ Contains code for the standard GP algorithm using DEAP.
 Written by Asher Stout, 300432820
 """
 from deap import base, creator, tools, gp
-from shared import protected_division, eval_solution
 import operator as op
 import random as rand
-import pandas
 import numpy
+import pandas
+import shared
 
 
 def create_primitives(attrs=1):
@@ -23,7 +23,7 @@ def create_primitives(attrs=1):
     terminal_function_set.addPrimitive(op.add, 2)
     terminal_function_set.addPrimitive(op.sub, 2)
     terminal_function_set.addPrimitive(op.mul, 2)
-    terminal_function_set.addPrimitive(protected_division, 2)
+    terminal_function_set.addPrimitive(shared.protected_division, 2)
     terminal_function_set.addPrimitive(op.abs, 1)
     return terminal_function_set
 
@@ -31,7 +31,7 @@ def create_primitives(attrs=1):
 def create_definitions(tb, pset):
     """
     Initializes a variety of parameters using the DEAP creator & toolbox
-    
+
     :param tb: reference to the DEAP toolbox
     :param pset: the primitive set
     :return:
@@ -39,7 +39,7 @@ def create_definitions(tb, pset):
     # Initialize individual, fitness, and population
     creator.create("MOFitness", base.Fitness, weights=(-1.0, -1.0))
     creator.create("Individual", gp.PrimitiveTree, fitness=creator.MOFitness)
-    tb.register("initialize", gp.genHalfAndHalf, pset=pset, min_=1, max_=3)
+    tb.register("initialize", gp.genHalfAndHalf, pset=pset, min_=3, max_=5)
     tb.register("individual", tools.initIterate, container=creator.Individual, generator=tb.initialize)
     tb.register("population", tools.initRepeat, container=list, func=tb.individual)
 
@@ -52,7 +52,7 @@ def create_definitions(tb, pset):
 
     # Register selection, evaluation, compiliation
     tb.register("selection", tools.selTournament, tournsize=5)
-    tb.register("evaluation", eval_solution, tb=tb)
+    tb.register("evaluation", shared.eval_solution, tb=tb)
     tb.register("compile", gp.compile, pset=pset)
     return
 
@@ -79,8 +79,8 @@ def main(data, labels, attrs, generations=50, pop_size=100, cxpb=0.5, mutpb=0.1)
 
     # Initialize population & compute initial fitnesses
     pop = toolbox.population(n=pop_size)
-    fitnesses = [toolbox.evaluation(function=ind, data=data, actual=labels) for ind in pop]
-    for ind, fit in zip([ind for ind in pop if not ind.fitness.valid], fitnesses):
+    fitness = [toolbox.evaluation(function=ind, data=data, actual=labels) for ind in pop]
+    for ind, fit in zip([ind for ind in pop if not ind.fitness.valid], fitness):
         ind.fitness.values = fit
     logbook.record(gen=0, **stats.compile(pop))
     print(logbook.stream)
@@ -103,14 +103,14 @@ def main(data, labels, attrs, generations=50, pop_size=100, cxpb=0.5, mutpb=0.1)
                 del ind.fitness.values
 
         # Update fitness & print log
-        fitnesses = [toolbox.evaluation(function=ind, data=data, actual=labels) for ind in nextgen]
-        for ind, fit in zip([ind for ind in nextgen if not ind.fitness.valid], fitnesses):
+        fitness = [toolbox.evaluation(function=ind, data=data, actual=labels) for ind in nextgen]
+        for ind, fit in zip([ind for ind in nextgen if not ind.fitness.valid], fitness):
             ind.fitness.values = fit
         logbook.record(gen=g, **stats.compile(pop))
         print(logbook.stream)
 
         pop[:] = nextgen
-    return
+    return pop, logbook
 
 
 if __name__ == "__main__":
@@ -118,4 +118,9 @@ if __name__ == "__main__":
     winered = pandas.read_csv("winequality-red.csv", sep=";")
     winered_data = winered.drop(['quality'], axis=1).values
     winered_target = winered['quality'].values
-    main(winered_data, winered_target, winered_data.shape[1])
+
+    # Evolve population, then draw descent & trees
+    pop, logs = main(winered_data, winered_target, winered_data.shape[1])
+    shared.draw_descent(logs, measure='min')
+    shared.draw_solution(pop[0])
+
