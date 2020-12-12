@@ -1,0 +1,50 @@
+\documentclass[a4paper]{article}
+
+\usepackage[margin=1in]{geometry}    
+\usepackage[english]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{algorithm}
+\usepackage{fancyhdr}
+\usepackage{arevmath}
+\usepackage{mathtools}     
+\usepackage[noend]{algpseudocode}
+
+%Header info
+\lhead{Asher Stout}
+\rhead{300432820, VUW}
+\thispagestyle{fancy}
+
+\begin{document}
+%Begin algorithm itself
+\begin{algorithm}
+\caption{Multi-objective GP using the Transient Terminal Set}
+\hspace*{\algorithmicindent} \textbf{Input:} population size \(\rho\), crossover probability \textit{p$_{c}$}, mutation probability \textit{p$_{m}$}, transient mutation probability \textit{p$_{d}$}, terminal set \(T\), function set \(F\), death age \(\alpha\) \\
+\hspace*{\algorithmicindent} \textbf{Define:} generation \(G_{n}\), individual fitness \(f_{i}\), transient terminal set \(M_{G_{n}}\), fitness threshold \(f_{t, G_{n}}\) \\ 
+\begin{algorithmic}[1]
+\State Initialize starting population \textit{$ P_{G_{0}} $}, \(M_{G_{0}}\leftarrow \emptyset\), \(f_{t, G_{0}} \leftarrow 0\)
+\While{\textit{no improvement in} \(\max f_{i}\in P_{G_{n}}\) \textit{since} \(P_{G_{n-5}}\)} \Comment{Evolve generation  \(G_{n+1}\)}
+	\State \(P_{G_{n+1}}\leftarrow \emptyset\), \(M_{G_{n+1}}\leftarrow M_{G_{n}}\)
+	\While{len\(P_{G_{n+1}} \neq \rho\)}	\Comment{Update population \(P_{G_{n+1}}\)}
+		\State Perform crossover $\forall i\in P_{G_{n}}$ with \textit{p$_{c}$}
+		\State Perform mutation $\forall i\in P_{G_{n}}$ with \textit{p$_{m}$}, \(T\), \(F\)
+		\State Perform transient mutation $\forall i\in P_{G_{n}}$ with \textit{p$_{d}$, \(M_{G_{n}}\)}
+		\State $P_{G_{n+1}} \leftarrow P_{G_{n+1}}\cup \{i | i_{offspring}\}$
+	\EndWhile\newline
+	\ForAll{subtree \(s \in  M_{G_{n+1}}\)}	\Comment{Update transient terminal set \(M_{G_{n+1}}\)}
+		\If{\(age(s) > \alpha\)}
+			\State Prune \(s\) from \(M_{G_{n+1}}\)
+		\EndIf
+	\EndFor
+	\State Compute $f_{t, G_{n}}$ from $\forall f_{i} \in P_{G_{n+1}}$
+	\For{$i\in P_{G_{n+1}}$}	
+		\State $f_{c}\leftarrow \Delta f_{i}$ from \(G_{n}\) to \(G_{n+1}\)
+		\If{ $f_{c} > $ \(f_{t, G_{n}}\)}
+			\State \(M_{G_{n+1}} \leftarrow M_{G_{n+1}} \cup \{\)subtree \(s\in i \}\)
+		\EndIf
+	\EndFor 
+\EndWhile
+\end{algorithmic}\end{algorithm}
+%Provide reasoning for why the algorithm will improve interpretability
+\paragraph{Note:} The transient terminal set is utilized during a genetic operation called \textit{transient mutation}, in which a candidate solution is mutated with a member of the set. The transient terminal set is composed of subtrees generated in the population (either through crossover or normal mutation) which have resulted in substantial increases in the fitness of candidate solutions.
+\paragraph{} The algorithm above seeks to improve the interpretability of Symbolic Regression models via the use of multi-objective GP and the proposed transient terminal set by improving the search process itself. By utilizing a complexity measure in addition to an error measure as the Pareto-efficient objectives for the algorithm, and pairing this with the proposed transient terminal set, it is theorized that candidate solutions will become less complex when compared with standard multi-objective GP. As the selection process for the transient terminal set follows this multi-objective framework, improvements in either objective will result in a candidate solution's altered subtree being added to the set. Thus, the transient terminal set distributes proven subtrees which result in lower errors and/or complexities throughout the population. This process potentially results in candidate solutions with both minimized error and complexity measures, and is a improvement from the entirely random mutation of standard multi-objective GP.
+\end{document}
