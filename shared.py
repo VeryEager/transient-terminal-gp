@@ -7,6 +7,7 @@ from sklearn.metrics import mean_squared_error
 from deap import gp
 import matplotlib.pyplot as plot
 import networkx     # used for plotting trees
+from networkx.drawing.nx_agraph import graphviz_layout
 
 
 def protected_division(x, y):
@@ -56,6 +57,7 @@ def draw_solution(individual):
     graph.add_edges_from(edge)
     graph.add_nodes_from(node)
 
+    pos = graphviz_layout(graph, prog="dot")
     networkx.draw_networkx_nodes(graph, pos)
     networkx.draw_networkx_edges(graph, pos)
     networkx.draw_networkx_labels(graph, pos, label)
