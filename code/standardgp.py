@@ -7,24 +7,36 @@ from deap import base, creator, tools, gp
 import operator as op
 import random as rand
 import numpy
+import os.path
 import pandas
 import shared
 
+rand.seed(96127708431)
 
-def create_primitives(attrs=1):
+
+def create_primitives(names, attrs=1):
     """
     Creates the terminal/function sets for standard GP
 
+    :param names: the names of features (as would appear in graph)
     :param attrs: number of features present in the data
     :return: terminal_function_set, the generated primitive set
     """
     terminal_function_set = gp.PrimitiveSet(name="PSET", arity=attrs)
-    terminal_function_set.addEphemeralConstant(name="PSET", ephemeral=lambda: rand.uniform(-5.0, 5.0))
+    terminal_function_set.addEphemeralConstant(name="PSET", ephemeral=lambda: rand.uniform(-1.0, 1.0))
     terminal_function_set.addPrimitive(op.add, 2)
     terminal_function_set.addPrimitive(op.sub, 2)
     terminal_function_set.addPrimitive(op.mul, 2)
     terminal_function_set.addPrimitive(shared.protected_division, 2)
     terminal_function_set.addPrimitive(op.abs, 1)
+
+    # Replace whitespaces with '_' in names
+    n = []
+    for name in names:
+       n.append(name.replace(" ", "_"))
+    # TODO this is an utterly horrible, hardcoded solution to setting multiple feature names.
+    terminal_function_set.renameArguments(ARG0=n[0], ARG1=n[1], ARG2=n[2], ARG3=n[3], ARG4=n[4], ARG5=n[5], ARG6=n[6],
+                                          ARG7=n[7], ARG8=n[8], ARG9=n[9], ARG10=n[10])
     return terminal_function_set
 
 
@@ -57,7 +69,7 @@ def create_definitions(tb, pset):
     return
 
 
-def main(data, labels, attrs, generations=50, pop_size=100, cxpb=0.5, mutpb=0.1):
+def main(data, labels, attrs, names, generations=50, pop_size=100, cxpb=0.5, mutpb=0.1):
     """
     Performs the setup for the main evolutionary process
 
@@ -65,7 +77,7 @@ def main(data, labels, attrs, generations=50, pop_size=100, cxpb=0.5, mutpb=0.1)
     """
     # Initialize toolbox & creator parameters
     toolbox = base.Toolbox()
-    primitives = create_primitives(data.shape[1])
+    primitives = create_primitives(names, data.shape[1])
     create_definitions(toolbox, primitives)
 
     # Initialize stats & logbook
@@ -115,12 +127,14 @@ def main(data, labels, attrs, generations=50, pop_size=100, cxpb=0.5, mutpb=0.1)
 
 if __name__ == "__main__":
     # Load wine data
-    winered = pandas.read_csv("winequality-red.csv", sep=";")
+    path = os.path.relpath('..\\data\\winequality-red.csv', os.path.dirname(__file__))
+
+    winered = pandas.read_csv(path, sep=";")
     winered_data = winered.drop(['quality'], axis=1).values
     winered_target = winered['quality'].values
 
     # Evolve population, then draw descent & trees
-    pop, logs = main(winered_data, winered_target, winered_data.shape[1])
+    pop, logs = main(winered_data, winered_target, winered_data.shape[1], winered.columns.drop(['quality']))
     shared.draw_descent(logs, measure='min')
     shared.draw_solution(pop[0])
 
