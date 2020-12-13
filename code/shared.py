@@ -39,7 +39,7 @@ def eval_solution(function, tb, data, actual):
     func = tb.compile(expr=function)
     results = [func(*res) for res in data]
 
-    accuracy = mean_squared_error(actual, results)
+    accuracy = mean_squared_error(actual, results, squared=False)
     complexity = function.height
     return accuracy, complexity,
 
@@ -61,6 +61,7 @@ def draw_solution(individual):
     networkx.draw_networkx_nodes(graph, pos)
     networkx.draw_networkx_edges(graph, pos)
     networkx.draw_networkx_labels(graph, pos, label)
+    plot.title(individual.fitness.values)
     plot.show()
 
 
@@ -74,14 +75,14 @@ def draw_descent(logs, measure):
     """
     # Create plot, add titles & initialize the axes axis
     fig, ax1 = plot.subplots()
-    fig.suptitle("Accuracy & Complexity of best individual over evolution: wine data")
+    fig.suptitle("Accuracy & Complexity of best solutions in generations over evolution: winequality-red")
     fig.tight_layout()
     ax1.set_xlabel('generation')
     ax2 = ax1.twinx()
     xax = list(log['gen'] for log in logs)
 
     # Draw first y axis ACCURACY
-    ax1.set_ylabel('accuracy (mse)', color="#800000")
+    ax1.set_ylabel('accuracy (rmse)', color="#800000")
     ax1.plot(xax, list(log[measure][0] for log in logs), color='#800000', alpha=0.6)
     ax1.tick_params(axis='y', labelcolor="#800000")
 

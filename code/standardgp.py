@@ -28,7 +28,6 @@ def create_primitives(names, attrs=1):
     terminal_function_set.addPrimitive(op.sub, 2)
     terminal_function_set.addPrimitive(op.mul, 2)
     terminal_function_set.addPrimitive(shared.protected_division, 2)
-    terminal_function_set.addPrimitive(op.abs, 1)
 
     # Replace whitespaces with '_' in names
     n = []
@@ -51,7 +50,7 @@ def create_definitions(tb, pset):
     # Initialize individual, fitness, and population
     creator.create("MOFitness", base.Fitness, weights=(-1.0, -1.0))
     creator.create("Individual", gp.PrimitiveTree, fitness=creator.MOFitness)
-    tb.register("initialize", gp.genHalfAndHalf, pset=pset, min_=3, max_=5)
+    tb.register("initialize", gp.genHalfAndHalf, pset=pset, min_=1, max_=4)
     tb.register("individual", tools.initIterate, container=creator.Individual, generator=tb.initialize)
     tb.register("population", tools.initRepeat, container=list, func=tb.individual)
 
@@ -73,7 +72,7 @@ def main(data, labels, attrs, names, generations=50, pop_size=100, cxpb=0.5, mut
     """
     Performs the setup for the main evolutionary process
 
-    :return:
+    :return: the best individual of the evolution & the log
     """
     # Initialize toolbox & creator parameters
     toolbox = base.Toolbox()
@@ -91,11 +90,15 @@ def main(data, labels, attrs, names, generations=50, pop_size=100, cxpb=0.5, mut
 
     # Initialize population & compute initial fitnesses
     pop = toolbox.population(n=pop_size)
+    hof = tools.ParetoFront()
+
     fitness = [toolbox.evaluation(function=ind, data=data, actual=labels) for ind in pop]
     for ind, fit in zip([ind for ind in pop if not ind.fitness.valid], fitness):
         ind.fitness.values = fit
+
     logbook.record(gen=0, **stats.compile(pop))
     print(logbook.stream)
+    hof.update(pop)
 
     # Begin evolution of population
     for g in range(1, generations):
@@ -114,15 +117,21 @@ def main(data, labels, attrs, names, generations=50, pop_size=100, cxpb=0.5, mut
                 toolbox.mutate(ind)
                 del ind.fitness.values
 
-        # Update fitness & print log
-        fitness = [toolbox.evaluation(function=ind, data=data, actual=labels) for ind in nextgen]
-        for ind, fit in zip([ind for ind in nextgen if not ind.fitness.valid], fitness):
+        # Update fitness
+        invalidind = [ind for ind in nextgen if not ind.fitness.valid]
+        fitness = [toolbox.evaluation(function=ind, data=data, actual=labels) for ind in invalidind]
+        for ind, fit in zip(invalidind, fitness):
             ind.fitness.values = fit
+
+        # Record generational log
         logbook.record(gen=g, **stats.compile(pop))
         print(logbook.stream)
 
+        # Replace population, update HoF
         pop[:] = nextgen
-    return pop, logbook
+        hof.update(pop)
+        print(len(hof))
+    return hof[0], logbook
 
 
 if __name__ == "__main__":
@@ -134,7 +143,7 @@ if __name__ == "__main__":
     winered_target = winered['quality'].values
 
     # Evolve population, then draw descent & trees
-    pop, logs = main(winered_data, winered_target, winered_data.shape[1], winered.columns.drop(['quality']))
+    best, logs = main(winered_data, winered_target, winered_data.shape[1], winered.columns.drop(['quality']))
     shared.draw_descent(logs, measure='min')
-    shared.draw_solution(pop[0])
+    shared.draw_solution(best)
 
