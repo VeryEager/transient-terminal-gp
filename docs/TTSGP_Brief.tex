@@ -3,9 +3,10 @@
 \usepackage[margin=1in]{geometry}    
 \usepackage[english]{babel}
 \usepackage[utf8]{inputenc}
+\usepackage{hyperref}
 \usepackage{fancyhdr}
 %opening
-\title{Improving Interpretability in Symbolic Regression Models Using Multi-objective GP and Dynamic Mutation Operators}
+\title{Improving Interpretability in Symbolic Regression Models Using Multi-objective GP and the Transient Terminal Set}
 \author{Asher Stout, 300432820}
 
 \begin{document}
@@ -13,12 +14,16 @@
 
 %Description of initial work & hours spent
 \section{Overview of Work \& Research}
+\paragraph{} Work began on the project with research into previous approaches for improving the interpretability of Symbolic Regression models, and ultimately Multi-objective GP (MOGP) was selected as an area for further study. Several relevant papers defined the interpretability of a solution as the depth or size of its tree, which may not accurately correlate to its computational complexity. Thus, it was decided that a new measure of complexity be developed for use in MOGP. In addition, the entirely random nature of mutation operators in MOGP was identified as place for potential innovation for improving Symbolic Regression model interpretability. This resulted in a new approach being developed called the \textbf{Transient Terminal Set}, which is described in further detail in \textbf{Section 2}.
+\paragraph{} Aside from research, extensive time was invested into learning the tools required for the completion of the project objectives - particularly Python, DEAP, and LaTeX. This involved practical applications in the form of tutorials and implementing a standard MOGP and culminated in the formal definition of the Transient Terminal Set algorithm (see \textbf{Section 2}) and its implementation using DEAP (see \textbf{Section 3}). 
+\paragraph{}The total hours spent on the project, as of 15 December 2020, were \textbf{130}.
 
 %Basically the algorithm contained in TTSGP_Algorithm, with some minor formatting adjustments
 \section{Transient Terminal Set}
 
 %From initial experimentation; graphs were generated using matplotlib and networkx/pygraphviz
 \section{Experimentation Results}
+\paragraph{Note:} The code for this experiment can be accessed at \url{https://github.com/VeryEager/transient-terminal-gp}
 
 %From the ideas document
 \section{Intended Future Work}
