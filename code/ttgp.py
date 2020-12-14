@@ -13,7 +13,7 @@ import shared
 import ttsclasses as tts
 
 rand.seed(shared.seed)
-transient = gp.PrimitiveSet(name="transient", arity=1)
+transient = tts.TransientSet(name="transient", arity=1, lifespan=5)
 
 
 def create_definitions(tb, pset):
@@ -26,7 +26,7 @@ def create_definitions(tb, pset):
     """
     # Initialize individual, fitness, and population
     creator.create("MOFitness", base.Fitness, weights=(-1.0, -1.0))
-    creator.create("Individual", tts.PrimitiveTree, fitness=creator.MOFitness)
+    creator.create("Individual", tts.TransientTree, fitness=creator.MOFitness)
     tb.register("initialize", gp.genHalfAndHalf, pset=pset, min_=1, max_=4)
     tb.register("individual", tools.initIterate, container=creator.Individual, generator=tb.initialize)
     tb.register("population", tools.initRepeat, container=list, func=tb.individual)

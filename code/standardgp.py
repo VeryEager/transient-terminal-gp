@@ -118,6 +118,6 @@ if __name__ == "__main__":
 
     # Evolve population, then draw descent & trees
     best, logs = main(winered_data, winered_target, winered_data.shape[1], winered.columns.drop(['quality']))
-    shared.draw_descent(logs, measure='min')
+    shared.draw_descent(logs, measure='mean')
     shared.draw_solution(best)
 

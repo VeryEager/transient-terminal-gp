@@ -13,7 +13,15 @@ class TransientTree(PrimitiveTree):
     (as well as relevant fitness values), so that meta-information on evolution can be
     stored & analyzed during transient mutation.
     """
-    pass
+    last = PrimitiveTree([])  # Tree of the previous generation; should be empty to begin
+
+    def update_last(self):
+        """
+        Updates the last generation tree by overwriting the existing entry with the current
+
+        :return:
+        """
+        last = self
 
 
 class TransientSet(PrimitiveSet):
@@ -21,6 +29,7 @@ class TransientSet(PrimitiveSet):
     Represents a dynamic set which is updated after each consecutive generation. The set
     contains subtrees pulled from the population which are subsequently mutated.
     """
+    lifespan = 5              # Number of generations before an entry is removed
 
     def update_set(self, population):
         """
