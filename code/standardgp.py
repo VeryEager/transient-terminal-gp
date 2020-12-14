@@ -105,7 +105,7 @@ def main(data, labels, attrs, names, generations=50, pop_size=100, cxpb=0.5, mut
         # Replace population, update HoF
         pop[:] = nextgen
         hof.update(pop)
-    return hof[0], logbook
+    return hof[1], logbook
 
 
 if __name__ == "__main__":
@@ -118,6 +118,5 @@ if __name__ == "__main__":
 
     # Evolve population, then draw descent & trees
     best, logs = main(winered_data, winered_target, winered_data.shape[1], winered.columns.drop(['quality']))
-    shared.draw_descent(logs, measure='mean')
+    shared.draw_descent(logs, measure='min')
     shared.draw_solution(best)
-

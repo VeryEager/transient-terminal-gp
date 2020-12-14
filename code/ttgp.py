@@ -85,7 +85,7 @@ def main(data, labels, attrs, names, generations=50, pop_size=100, cxpb=0.5, mut
         nextgen = toolbox.selection(pop, len(pop))
         nextgen = [toolbox.clone(ind) for ind in nextgen]
         for ind in nextgen:
-            ind = ind.update_last() # Update the metadata on evolution
+            ind = ind.update_last()  # Update the metadata on evolution
 
         # Perform crossover
         for child1, child2 in zip(nextgen[::2], nextgen[1::2]):
@@ -101,7 +101,7 @@ def main(data, labels, attrs, names, generations=50, pop_size=100, cxpb=0.5, mut
 
         # Perform transient mutation
         for ind in nextgen:
-            if (rand.random() < mutpb) & (transient.terms_count > 1):
+            if (rand.random() < mutpb/4) & (transient.terms_count > 1):
                 toolbox.transient_mutate(ind)
                 del ind.fitness.values
 
@@ -121,7 +121,7 @@ def main(data, labels, attrs, names, generations=50, pop_size=100, cxpb=0.5, mut
 
         # Update Transient Terminal Set after each generation
         transient.update_set(pop)
-    return hof[0], logbook
+    return hof[10], logbook
 
 
 if __name__ == "__main__":

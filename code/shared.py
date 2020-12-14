@@ -84,7 +84,7 @@ def draw_descent(logs, measure):
     """
     # Create plot, add titles & initialize the axes axis
     fig, ax1 = plot.subplots()
-    fig.suptitle("Accuracy & Complexity of best solutions in generations over evolution: winequality-red")
+    fig.suptitle("Accuracy & Complexity of average solution during evolution: TTS gp")
     fig.tight_layout()
     ax1.set_xlabel('generation')
     ax2 = ax1.twinx()

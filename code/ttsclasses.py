@@ -6,6 +6,7 @@ Written by Asher Stout, 300432820
 
 from deap.gp import PrimitiveTree, PrimitiveSet
 from numpy import mean, percentile
+from datetime import datetime
 from os.path import commonprefix
 
 
@@ -37,16 +38,13 @@ class TransientTree(PrimitiveTree):
         :return: the computed subtree
         """
         # Remove prefix of trees
-        print(self)
-        print(self.former)
-        temp = self
+        temp = self.__deepcopy__({})
         prefix = self.__prefix(False)
-        temp = [n for n in temp if n not in prefix]
+        [temp.remove(pre) for pre in prefix]
         temp.reverse()
         prefix = self.__prefix(True)
-        temp = [n for n in temp if n not in prefix]
+        [temp.remove(pre) for pre in prefix]
         temp.reverse()
-
         return temp
 
     def __prefix(self, reverse=False):
@@ -55,19 +53,19 @@ class TransientTree(PrimitiveTree):
 
         :return: The longest prefix between the current & previous tree
         """
-        sel = self
-        frm = self.former
+        # TODO: bugged currently, this does not take into account that the subtree change may be partially identical
+        # to the existing one
+        sel = self.__deepcopy__({})
+        frm = self.former.__deepcopy__({})
         if reverse:  # If needed, reverse
             sel.reverse()
             frm.reverse()
-
         prefix = []
         for i in range(0, len(sel)):
             if sel[i] == frm[i]:
                 prefix.append(sel[i])
             else:
                 break
-
         return prefix
 
 
@@ -88,7 +86,7 @@ class TransientSet(PrimitiveSet):
         Updates the transient terminal set by adding new subtrees and removing deprecated ones.
 
         :param population: the population in the current generation
-        :return: the updated transient terminal set
+        :return:
         """
         ntran = self
 
@@ -108,6 +106,6 @@ class TransientSet(PrimitiveSet):
             com = ind.former.fitness.values[1]-ind.fitness.values[1]  # Add subtree if it improves enough
             if (acc > 0) & (acc > acc_threshold) & (com > 0) & (com > com_threshold):
                 subtree = ind.difference()
-                print(subtree)
-                # Add to set
+                if subtree:  # TODO: subtrees should never be none, this is a temporary solution
+                    self.addPrimitive(subtree[0], arity=1, name=str(str(subtree) + datetime.now().strftime("%H:%M:%S")))
         return ntran
