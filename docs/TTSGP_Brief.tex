@@ -25,7 +25,7 @@
 %Basically the algorithm contained in TTSGP_Algorithm, with some minor formatting adjustments
 \section{Transient Terminal Set}
 \begin{algorithm}
-	\caption{Multi-objective GP using the Transient Terminal Set}
+	\caption{Multi-objective GP using the Transient Terminal Set (TTSGP)}
 	\hspace*{\algorithmicindent} \textbf{Input:} population size \(\rho\), crossover probability \textit{p$_{c}$}, mutation probability \textit{p$_{m}$}, transient mutation probability \textit{p$_{d}$}, terminal set \(T\), function set \(F\), death age \(\alpha\) \\
 	\hspace*{\algorithmicindent} \textbf{Define:} generation \(G_{n}\), individual fitness \(f_{i}\), transient terminal set \(M_{G_{n}}\), fitness threshold \(f_{t, G_{n}}\) \\ 
 	\begin{algorithmic}[1]
@@ -54,7 +54,7 @@
 \end{algorithmic}\end{algorithm}
 %Provide reasoning for why the algorithm will improve interpretability
 \paragraph{Note:} The transient terminal set is utilized during a genetic operation called \textit{transient mutation}, in which a candidate solution is mutated with a member of the set. The transient terminal set is composed of subtrees generated in the population (either through crossover or normal mutation) which have resulted in substantial increases in the fitness of candidate solutions.
-\paragraph{} The algorithm above seeks to improve the interpretability of Symbolic Regression models via the use of multi-objective GP and the proposed transient terminal set by improving the search process itself. By utilizing a complexity measure in addition to an error measure as the Pareto-efficient objectives for the algorithm, and pairing this with the proposed transient terminal set, it is theorized that candidate solutions will become less complex when compared with standard multi-objective GP. As the selection process for the transient terminal set follows this multi-objective framework, improvements in either objective will result in a candidate solution's altered subtree being added to the set. Thus, the transient terminal set distributes proven subtrees that result in lower errors and/or complexities throughout the population. This process potentially results in candidate solutions with both minimized error and complexity measures, and is an improvement over the entirely randomized mutation of standard multi-objective GP.
+\paragraph{} The Transient Terminal Set seeks to improve the interpretability of Symbolic Regression models via the use of multi-objective GP by improving the search process itself. By utilizing a complexity measure in addition to an error measure as the Pareto-efficient objectives for the algorithm, and pairing this with the proposed transient terminal set, it is theorized that candidate solutions will become less complex when compared with standard multi-objective GP. As the selection process for the transient terminal set follows this multi-objective framework, improvements in either objective will result in a candidate solution's altered subtree being added to the set. Thus, the transient terminal set distributes proven subtrees that result in lower errors and/or complexities throughout the population. This process potentially results in candidate solutions with both minimized error and complexity measures, and is an improvement over the entirely randomized mutation of standard multi-objective GP.
 
 %From initial experimentation; graphs were generated using matplotlib and networkx/pygraphviz
 \section{Experimentation Results}
@@ -62,5 +62,11 @@
 
 %From the ideas document
 \section{Intended Future Work}
+While the majority of the Transient Terminal Set algorithm has been implemented in DEAP, there are several noteworthy aspects which will be further developed or implemented to improve the results of TTSGP. \begin{itemize}
+	\item First, pruning of the set will be fully implemented to ensure only relevant solutions are distributed during transient mutation.
+	\item Second, the criteria for a subtree to be added to the set will be made stricter, as the mean approach is susceptible to outliers. Experimentation will be done to investigate which alternative (median, percentile, etc) is best suited for this problem.
+	\item Third, as mentioned in \textbf{Section 1}, a more appropriate measure of model complexity will be created to ensure candidate solutions in TTSGP are actually less complex.
+	\item Fourth, further research and experimentation into the \textit{probability of node insertion} and \textit{probability of a terminal} during mutation will be performed, as these concepts are closely linked with the Transient Terminal Set.
+\end{itemize}
 
 \end{document}

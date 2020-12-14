@@ -7,6 +7,7 @@ from sklearn.metrics import mean_squared_error
 from networkx.drawing.nx_agraph import graphviz_layout
 from deap import gp
 import operator as op
+import numpy as np
 import matplotlib.pyplot as plot
 import random as rand
 import networkx     # used for plotting trees
@@ -41,6 +42,9 @@ def eval_solution(function, tb, data, actual):
     :param actual: the correct predictions for the data
     :return: a tuple of fitnesses
     """
+    if function is None:    # In exceptional circumstances only
+        return np.Infinity, np.Infinity,
+
     func = tb.compile(expr=function)
     results = [func(*res) for res in data]
 

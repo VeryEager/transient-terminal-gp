@@ -37,6 +37,9 @@ def create_definitions(tb, pset):
     tb.register("expr_mut", gp.genFull, min_=1, max_=3)
     tb.register("mutate", gp.mutUniform, expr=tb.expr_mut, pset=pset)
     tb.decorate("mutate", gp.staticLimit(key=op.attrgetter("height"), max_value=12))
+    tb.register("expr_trans_mut", gp.genFull, min_=1, max_=1)
+    tb.register("transient_mutate", gp.mutUniform, expr=tb.expr_trans_mut, pset=transient)
+    tb.decorate("transient_mutate", gp.staticLimit(key=op.attrgetter("height"), max_value=12))
 
     # Register selection, evaluation, compiliation
     tb.register("selection", tools.selTournament, tournsize=5)
@@ -81,6 +84,8 @@ def main(data, labels, attrs, names, generations=50, pop_size=100, cxpb=0.5, mut
     for g in range(1, generations):
         nextgen = toolbox.selection(pop, len(pop))
         nextgen = [toolbox.clone(ind) for ind in nextgen]
+        for ind in nextgen:
+            ind = ind.update_last() # Update the metadata on evolution
 
         # Perform crossover
         for child1, child2 in zip(nextgen[::2], nextgen[1::2]):
@@ -95,14 +100,16 @@ def main(data, labels, attrs, names, generations=50, pop_size=100, cxpb=0.5, mut
                 del ind.fitness.values
 
         # Perform transient mutation
+        for ind in nextgen:
+            if (rand.random() < mutpb) & (transient.terms_count > 1):
+                toolbox.transient_mutate(ind)
+                del ind.fitness.values
 
         # Update fitness
         invalidind = [ind for ind in nextgen if not ind.fitness.valid]
         fitness = [toolbox.evaluation(function=ind, data=data, actual=labels) for ind in invalidind]
         for ind, fit in zip(invalidind, fitness):
             ind.fitness.values = fit
-
-        # Update Transient Terminal Set
 
         # Record generational log
         logbook.record(gen=g, **stats.compile(pop))
@@ -111,6 +118,9 @@ def main(data, labels, attrs, names, generations=50, pop_size=100, cxpb=0.5, mut
         # Replace population, update HoF
         pop[:] = nextgen
         hof.update(pop)
+
+        # Update Transient Terminal Set after each generation
+        transient.update_set(pop)
     return hof[0], logbook
 
 
