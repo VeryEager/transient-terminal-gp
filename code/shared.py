@@ -4,10 +4,15 @@ Contains functions shared by both standard & modified MOGP.
 Written by Asher Stout, 300432820
 """
 from sklearn.metrics import mean_squared_error
-from deap import gp
-import matplotlib.pyplot as plot
-import networkx     # used for plotting trees
 from networkx.drawing.nx_agraph import graphviz_layout
+from deap import gp
+import operator as op
+import matplotlib.pyplot as plot
+import random as rand
+import networkx     # used for plotting trees
+
+seed = 96127708431
+rand.seed(seed)
 
 
 def protected_division(x, y):
@@ -93,3 +98,28 @@ def draw_descent(logs, measure):
 
     fig.tight_layout()
     plot.show()
+
+
+def create_primitives(names, attrs=1):
+    """
+    Creates the terminal/function sets for GP
+
+    :param names: the names of features (as would appear in graph)
+    :param attrs: number of features present in the data
+    :return: terminal_function_set, the generated primitive set
+    """
+    terminal_function_set = gp.PrimitiveSet(name="PSET", arity=attrs)
+    terminal_function_set.addEphemeralConstant(name="PSET", ephemeral=lambda: rand.uniform(-1.0, 1.0))
+    terminal_function_set.addPrimitive(op.add, 2)
+    terminal_function_set.addPrimitive(op.sub, 2)
+    terminal_function_set.addPrimitive(op.mul, 2)
+    terminal_function_set.addPrimitive(protected_division, 2)
+
+    # Replace whitespaces with '_' in feature names
+    n = []
+    for name in names:
+       n.append(name.replace(" ", "_"))
+    # TODO this is an utterly horrible, hardcoded solution to setting multiple feature names.
+    terminal_function_set.renameArguments(ARG0=n[0], ARG1=n[1], ARG2=n[2], ARG3=n[3], ARG4=n[4], ARG5=n[5], ARG6=n[6],
+                                          ARG7=n[7], ARG8=n[8], ARG9=n[9], ARG10=n[10])
+    return terminal_function_set
