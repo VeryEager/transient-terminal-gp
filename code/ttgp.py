@@ -11,6 +11,7 @@ import os.path
 import pandas
 import shared
 import ttsclasses as tts
+import ttsfunctions as ttsf
 
 rand.seed(shared.seed)
 transient = tts.TransientSet(name="transient", arity=1, lifespan=5)
@@ -37,8 +38,8 @@ def create_definitions(tb, pset):
     tb.register("expr_mut", gp.genFull, min_=1, max_=3)
     tb.register("mutate", gp.mutUniform, expr=tb.expr_mut, pset=pset)
     tb.decorate("mutate", gp.staticLimit(key=op.attrgetter("height"), max_value=12))
-    tb.register("expr_trans_mut", gp.genFull, min_=1, max_=1)
-    tb.register("transient_mutate", gp.mutUniform, expr=tb.expr_trans_mut, pset=transient)
+    tb.register("expr_trans_mut", ttsf.genRand)
+    tb.register("transient_mutate", gp.mutUniform, expr=tb.expr_trans_mut, ttset=transient)
     tb.decorate("transient_mutate", gp.staticLimit(key=op.attrgetter("height"), max_value=12))
 
     # Register selection, evaluation, compiliation
@@ -102,9 +103,8 @@ def main(data, labels, attrs, names, generations=50, pop_size=100, cxpb=0.5, mut
         # Perform transient mutation
         for ind in nextgen:
             if (rand.random() < mutpb/4) & (transient.terms_count > 1):
-                #toolbox.transient_mutate(ind)
-                #del ind.fitness.values
-                pass  # TODO: mutation operator has bugs; need to define transient mutation in toolbox
+                toolbox.transient_mutate(ind)
+                del ind.fitness.values
 
         # Update fitness
         invalidind = [ind for ind in nextgen if not ind.fitness.valid]
