@@ -4,9 +4,10 @@ This file contains classes and functions requried for the implementation of Tran
 Written by Asher Stout, 300432820
 """
 
-from deap.gp import PrimitiveTree, PrimitiveSet
+from deap.gp import PrimitiveTree, PrimitiveSet, Terminal
 from numpy import mean, percentile
 from datetime import datetime
+from collections import defaultdict
 from os.path import commonprefix
 
 
@@ -16,7 +17,6 @@ class TransientTree(PrimitiveTree):
     (as well as relevant fitness values), so that meta-information on evolution can be
     stored & analyzed during transient mutation.
     """
-    former = None  # Tree of the previous generation; should be empty to begin
 
     def __init__(self, content):
         self.former = None
@@ -74,18 +74,20 @@ class TransientSet(PrimitiveSet):
     Represents a dynamic set which is updated after each consecutive generation. The set
     contains subtrees pulled from the population and are subsequently used during mutation.
     """
-    lifespan = 5              # Number of generations before an entry is removed from the set
-    entry_life = []           # Records active members of set
 
     def __init__(self, name, arity, lifespan):
         PrimitiveSet.__init__(self, name, arity)
+        self.transient = []
+        self.trans_count = 0
         self.lifespan = lifespan
+        self.entry_life = []
 
-    def update_set(self, population):
+    def update_set(self, population, generation):
         """
         Updates the transient terminal set by adding new subtrees and removing deprecated ones.
 
         :param population: the population in the current generation
+        :param generation: the current generation
         :return:
         """
         ntran = self
@@ -93,9 +95,9 @@ class TransientSet(PrimitiveSet):
         # Remove deprecated subtrees
         self.entry_life = [life-1 for life in self.entry_life]
         for life in self.entry_life:
-            if life == 1:
-                # TODO: Subtrees should not exist in population indefinitely
-                pass
+            if life + self.lifespan < generation:
+                self.entry_life.pop()
+                self.removeOldestSubtree()
 
         # Calculate mean change in fitness measures
         acc_threshold = mean([ind.former.fitness.values[0]-ind.fitness.values[0] for ind in population])
@@ -105,7 +107,64 @@ class TransientSet(PrimitiveSet):
             acc = ind.former.fitness.values[0]-ind.fitness.values[0]
             com = ind.former.fitness.values[1]-ind.fitness.values[1]  # Add subtree if it improves enough
             if (acc > 0) & (acc > acc_threshold) & (com > 0) & (com > com_threshold):
-                subtree = ind.difference()
-                if subtree:  # TODO: subtrees should never be none, this is a temporary solution
-                    self.addPrimitive(subtree[0], arity=1, name=str(str(subtree) + datetime.now().strftime("%H:%M:%S")))
+                diff = ind.difference()
+                subtree = TransientSubtree(diff, str(diff))
+                if diff and not self.context.keys().__contains__(subtree.name):  # TODO: diff should never be none, this is a temporary solution
+                    self.addSubtree(subtree)
+                    self.entry_life.append(generation)
         return ntran
+
+    def addSubtree(self, subtree):
+        """
+        Adds a subtree (composed of primitives & terminals) to the TTS
+
+        :param subtree: subtree to add
+        :param name: internal name of the subtree
+        :return:
+        """
+        self.mapping[subtree.name] = subtree
+        self.context[subtree.name] = subtree
+        self.transient.append(subtree)
+        self.trans_count += 1
+        return
+
+    def removeOldestSubtree(self):
+        """
+        Removes the oldest subtree from the TTS. As subtree are added sequentially, the oldest subtrees
+        are stored in the front of the set.
+
+        :return:
+        """
+        print("OLD", [s.name for s in self.transient])
+        subtree = self.transient.pop(0)
+        del self.mapping[subtree.name]
+        del self.context[subtree.name]
+        self.trans_count -= 1
+        print("NEW", [s.name for s in self.transient])
+
+        return
+
+
+class TransientSubtree(object):
+    """
+    Defines a subtree used during transient mutation; composed of a list of primitives/terminals
+
+    """
+    def __init__(self, tree, name):
+        self.tree = tree
+        self.name = name
+
+    def arity(self):
+        """
+        Arity of a Transient Subtree is always 0
+
+        :return:
+        """
+        return 0
+
+    def format(self):
+        form = ""
+        form = [form + node.format() for node in self.tree]
+        return form
+
+

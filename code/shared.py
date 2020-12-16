@@ -74,17 +74,18 @@ def draw_solution(individual):
     plot.show()
 
 
-def draw_descent(logs, measure):
+def draw_descent(logs, measure, method):
     """
     Plots the accuracy of a selected measure over generations, for both accuracy and complexity
 
     :param logs: the logbook from the main execution
     :param measure: the measure to plot from the logbook
+    :param method: method used, in string format
     :return:
     """
     # Create plot, add titles & initialize the axes axis
     fig, ax1 = plot.subplots()
-    fig.suptitle("Accuracy & Complexity of average solution during evolution: TTS gp")
+    fig.suptitle("Accuracy & Complexity of average solution during evolution: " + method)
     fig.tight_layout()
     ax1.set_xlabel('generation')
     ax2 = ax1.twinx()

@@ -102,8 +102,9 @@ def main(data, labels, attrs, names, generations=50, pop_size=100, cxpb=0.5, mut
         # Perform transient mutation
         for ind in nextgen:
             if (rand.random() < mutpb/4) & (transient.terms_count > 1):
-                toolbox.transient_mutate(ind)
-                del ind.fitness.values
+                #toolbox.transient_mutate(ind)
+                #del ind.fitness.values
+                pass  # TODO: mutation operator has bugs; need to define transient mutation in toolbox
 
         # Update fitness
         invalidind = [ind for ind in nextgen if not ind.fitness.valid]
@@ -120,7 +121,7 @@ def main(data, labels, attrs, names, generations=50, pop_size=100, cxpb=0.5, mut
         hof.update(pop)
 
         # Update Transient Terminal Set after each generation
-        transient.update_set(pop)
+        transient.update_set(pop, g)
     return hof[10], logbook
 
 
@@ -134,5 +135,5 @@ if __name__ == "__main__":
 
     # Evolve population, then draw descent & trees
     best, logs = main(winered_data, winered_target, winered_data.shape[1], winered.columns.drop(['quality']))
-    shared.draw_descent(logs, measure='min')
+    shared.draw_descent(logs, measure='min', method="TTS GP")
     shared.draw_solution(best)
