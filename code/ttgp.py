@@ -39,7 +39,7 @@ def create_definitions(tb, pset):
     tb.register("mutate", gp.mutUniform, expr=tb.expr_mut, pset=pset)
     tb.decorate("mutate", gp.staticLimit(key=op.attrgetter("height"), max_value=12))
     tb.register("expr_trans_mut", ttsf.genRand)
-    tb.register("transient_mutate", gp.mutUniform, expr=tb.expr_trans_mut, ttset=transient)
+    tb.register("transient_mutate", ttsf.transientMutUniform, expr=tb.expr_trans_mut, pset=transient)
     tb.decorate("transient_mutate", gp.staticLimit(key=op.attrgetter("height"), max_value=12))
 
     # Register selection, evaluation, compiliation
@@ -102,7 +102,7 @@ def main(data, labels, attrs, names, generations=50, pop_size=100, cxpb=0.5, mut
 
         # Perform transient mutation
         for ind in nextgen:
-            if (rand.random() < mutpb/4) & (transient.terms_count > 1):
+            if (rand.random() < mutpb/2) and (transient.trans_count >= 1):
                 toolbox.transient_mutate(ind)
                 del ind.fitness.values
 
@@ -122,7 +122,7 @@ def main(data, labels, attrs, names, generations=50, pop_size=100, cxpb=0.5, mut
 
         # Update Transient Terminal Set after each generation
         transient.update_set(pop, g)
-    return hof[10], logbook
+    return hof[0], logbook
 
 
 if __name__ == "__main__":
