@@ -4,7 +4,7 @@ This file contains classes and functions requried for the implementation of Tran
 Written by Asher Stout, 300432820
 """
 
-from deap.gp import PrimitiveTree, PrimitiveSet, Terminal
+from deap.gp import PrimitiveTree, PrimitiveSet, Terminal, Primitive
 from numpy import mean, percentile
 from datetime import datetime
 from collections import defaultdict
@@ -37,36 +37,61 @@ class TransientTree(PrimitiveTree):
 
         :return: the computed subtree
         """
-        # Remove prefix of trees
-        temp = self.__deepcopy__({})
-        prefix = self.__prefix(False)
-        [temp.remove(pre) for pre in prefix]
-        temp.reverse()
-        prefix = self.__prefix(True)
-        [temp.remove(pre) for pre in prefix]
-        temp.reverse()
-        return temp
+        print(self.__deepcopy__({}))
+        print(self.former.__deepcopy__({}))
+        prefix = self.__prefix([], self.__deepcopy__({}), self.former.__deepcopy__({}))
+        print(prefix)
+        return prefix
 
-    def __prefix(self, reverse=False):
+    def __prefix(self, prefix, new, old):
         """
-        Computes the longest possible prefix of a tree
+        Computes the longest possible prefix of a tree (ie, nodes which do not change between generations)
 
         :return: The longest prefix between the current & previous tree
         """
-        # TODO: bugged currently, this does not take into account that the subtree change may be partially identical
-        # to the existing one
-        sel = self.__deepcopy__({})
-        frm = self.former.__deepcopy__({})
-        if reverse:  # If needed, reverse
-            sel.reverse()
-            frm.reverse()
-        prefix = []
-        for i in range(0, len(sel)):
-            if sel[i] == frm[i]:
-                prefix.append(sel[i])
-            else:
-                break
+        if new[0] == old[0]:
+            if isinstance(new[0], Primitive):
+                # Configure initial variables for searching of a primitive's subtrees
+                old.pop(0)
+                node = new.pop(0)
+                remaining_subtrees = node.arity
+                num_subtrees_changed = 0
+
+                while remaining_subtrees > 0:
+
+                    #  Retrieve the current subtrees to be compared
+                    new_subtree = self.__gather_subtree([], rem=new[0:len(new)])
+                    old_subtree = self.__gather_subtree([], rem=old[0:len(old)])
+                    new_prefix = self.__prefix(prefix, new_subtree, old_subtree)
+
+                    # If some change between subtrees, then record for analysis of
+                    if new_prefix != prefix:
+                        num_subtrees_changed += 1
+                        prefix = new_prefix
+
+                    # Update the searching sets, increment remaining subtrees
+                    [new.remove(node) for node in new_subtree]
+                    [old.remove(node) for node in old_subtree]
+                    remaining_subtrees -= 1
+
+                # If all subtrees changed, then also add their parent node
+                if num_subtrees_changed == node.arity:
+                    prefix.insert(0, node)
+        else:
+            prefix = prefix.extend(self.__gather_subtree(rem=new[0:len(new)]))  # This maybe adds all child nodes?
         return prefix
+
+    def __gather_subtree(self, subtree=list(), rem=[]):
+        subtree.append(rem[0])
+        if isinstance(rem[0], Terminal):
+            return subtree
+        else:  # DOES NOT TAKE ARITY OF PRIMITIVE INTO ACCOUNT
+            num_subtrees = rem[0].arity
+            while num_subtrees > 0:
+                subtree = self.__gather_subtree(subtree=subtree, rem=rem[1:len(rem)])
+                num_subtrees -= 1
+            return subtree
+
 
 
 class TransientSet(PrimitiveSet):
