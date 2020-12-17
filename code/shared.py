@@ -107,7 +107,7 @@ def draw_descent(logs, measure, method):
 
 def create_primitives(names, attrs=1):
     """
-    Creates the terminal/function sets for GP
+    Creates the terminal/function sets for GP crossover/mutation
 
     :param names: the names of features (as would appear in graph)
     :param attrs: number of features present in the data
@@ -120,11 +120,8 @@ def create_primitives(names, attrs=1):
     terminal_function_set.addPrimitive(op.mul, 2)
     terminal_function_set.addPrimitive(protected_division, 2)
 
-    # Replace whitespaces with '_' in feature names
+    # Ensure feature names are legal & rename arguments to match them
     n = []
-    for name in names:
-       n.append(name.replace(" ", "_"))
-    # TODO this is an utterly horrible, hardcoded solution to setting multiple feature names.
-    terminal_function_set.renameArguments(ARG0=n[0], ARG1=n[1], ARG2=n[2], ARG3=n[3], ARG4=n[4], ARG5=n[5], ARG6=n[6],
-                                          ARG7=n[7], ARG8=n[8], ARG9=n[9], ARG10=n[10])
+    [n.append(name.replace(" ", "_")) for name in names]
+    terminal_function_set.renameArguments(**{'ARG' + str(i) : n[i] for i in range(0, len(names))})
     return terminal_function_set
