@@ -102,7 +102,7 @@ def main(data, labels, attrs, names, generations=50, pop_size=100, cxpb=0.5, mut
 
         # Perform transient mutation
         for ind in nextgen:
-            if (rand.random() < mutpb/2) and (transient.trans_count >= 1):
+            if (rand.random() < mutpb) and (transient.trans_count >= 1):
                 toolbox.transient_mutate(ind)
                 del ind.fitness.values
 
