@@ -12,8 +12,10 @@ import matplotlib.pyplot as plot
 import random as rand
 import networkx     # used for plotting trees
 
-seed = 96127708431
-rand.seed(seed)
+seeds = [142277182054, 768566379036, 811713195269, 916455223607, 858239192469, 113657088192, 501361380679, 728967379070,
+         466239079701, 514268874034, 909404864085, 718695369195, 189358890180, 56314292514, 182517534585, 463713806052,
+         551741675783, 356050300876, 199513820155, 212233320013, 965770343650, 868453318237, 57957421689, 34232141053,
+         589612735657, 638735100978, 600111142552, 277859885436, 429470303625, 124205190322]
 
 
 def protected_division(x, y):
@@ -85,7 +87,7 @@ def draw_descent(logs, measure, method):
     """
     # Create plot, add titles & initialize the axes axis
     fig, ax1 = plot.subplots()
-    fig.suptitle("Accuracy & Complexity of average solution during evolution: " + method)
+    fig.suptitle("Accuracy & Complexity of " + measure + " solution during evolution: " + method)
     fig.tight_layout()
     ax1.set_xlabel('generation')
     ax2 = ax1.twinx()

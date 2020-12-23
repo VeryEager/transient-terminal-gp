@@ -13,7 +13,6 @@ import shared
 import ttsclasses as tts
 import ttsfunctions as ttsf
 
-rand.seed(shared.seed)
 transient = tts.TransientSet(name="transient", arity=1, lifespan=5)
 
 
@@ -43,7 +42,7 @@ def create_definitions(tb, pset):
     tb.decorate("transient_mutate", gp.staticLimit(key=op.attrgetter("height"), max_value=12))
 
     # Register selection, evaluation, compiliation
-    tb.register("selection", tools.selTournament, tournsize=5)
+    tb.register("selection", tools.selNSGA2)
     tb.register("evaluation", shared.eval_solution, tb=tb)
     tb.register("compile", gp.compile, pset=pset)
     return
@@ -60,6 +59,10 @@ def main(data, labels, attrs, names, generations=50, pop_size=100, cxpb=0.5, mut
     primitives = shared.create_primitives(names, data.shape[1])
     create_definitions(toolbox, primitives)
 
+    # Initialize population & compute initial fitnesses
+    pop = toolbox.population(n=pop_size)
+    hof = tools.ParetoFront()
+
     # Initialize stats & logbook
     stats = tools.Statistics(lambda ind: ind.fitness.values)
     stats.register("min", numpy.min, axis=0)
@@ -67,19 +70,15 @@ def main(data, labels, attrs, names, generations=50, pop_size=100, cxpb=0.5, mut
     stats.register("max", numpy.max, axis=0)
     stats.register("std", numpy.std, axis=0)
     logbook = tools.Logbook()
-    logbook.header = "gen", "min", "mean", "max", "std"
-
-    # Initialize population & compute initial fitnesses
-    pop = toolbox.population(n=pop_size)
-    hof = tools.ParetoFront()
+    logbook.header = "gen", "min", "mean", "max", "std", "best"
 
     fitness = [toolbox.evaluation(function=ind, data=data, actual=labels) for ind in pop]
     for ind, fit in zip([ind for ind in pop if not ind.fitness.valid], fitness):
         ind.fitness.values = fit
 
-    logbook.record(gen=0, **stats.compile(pop))
-    print(logbook.stream)
     hof.update(pop)
+    logbook.record(gen=0, best=hof[0].fitness.getValues(), **stats.compile(pop))
+    print(logbook.stream)
 
     # Begin evolution of population
     for g in range(1, generations):
@@ -112,13 +111,13 @@ def main(data, labels, attrs, names, generations=50, pop_size=100, cxpb=0.5, mut
         for ind, fit in zip(invalidind, fitness):
             ind.fitness.values = fit
 
-        # Record generational log
-        logbook.record(gen=g, **stats.compile(pop))
-        print(logbook.stream)
-
         # Replace population, update HoF
         pop[:] = nextgen
         hof.update(pop)
+
+        # Record generational log
+        logbook.record(gen=g, best=hof[0].fitness.getValues(), **stats.compile(pop))
+        print(logbook.stream)
 
         # Update Transient Terminal Set after each generation
         transient.update_set(pop, g)
@@ -135,5 +134,5 @@ if __name__ == "__main__":
 
     # Evolve population, then draw descent & trees
     best, logs = main(winered_data, winered_target, winered_data.shape[1], winered.columns.drop(['quality']))
-    shared.draw_descent(logs, measure='min', method="TTS GP")
+    shared.draw_descent(logs, measure='best', method="TTS GP")
     shared.draw_solution(best)

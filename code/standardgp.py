@@ -11,8 +11,6 @@ import os.path
 import pandas
 import shared
 
-rand.seed(shared.seed)
-
 
 def create_definitions(tb, pset):
     """
@@ -37,7 +35,7 @@ def create_definitions(tb, pset):
     tb.decorate("mutate", gp.staticLimit(key=op.attrgetter("height"), max_value=12))
 
     # Register selection, evaluation, compiliation
-    tb.register("selection", tools.selTournament, tournsize=5)
+    tb.register("selection", tools.selNSGA2)
     tb.register("evaluation", shared.eval_solution, tb=tb)
     tb.register("compile", gp.compile, pset=pset)
     return
@@ -61,7 +59,7 @@ def main(data, labels, attrs, names, generations=50, pop_size=100, cxpb=0.5, mut
     stats.register("max", numpy.max, axis=0)
     stats.register("std", numpy.std, axis=0)
     logbook = tools.Logbook()
-    logbook.header = "gen", "min", "mean", "max", "std"
+    logbook.header = "gen", "min", "mean", "max", "std", "best"
 
     # Initialize population & compute initial fitnesses
     pop = toolbox.population(n=pop_size)
@@ -71,9 +69,10 @@ def main(data, labels, attrs, names, generations=50, pop_size=100, cxpb=0.5, mut
     for ind, fit in zip([ind for ind in pop if not ind.fitness.valid], fitness):
         ind.fitness.values = fit
 
-    logbook.record(gen=0, **stats.compile(pop))
-    print(logbook.stream)
     hof.update(pop)
+    print(hof[0].fitness.getValues())
+    logbook.record(gen=0, best=hof[0].fitness.getValues(), **stats.compile(pop))
+    print(logbook.stream)
 
     # Begin evolution of population
     for g in range(1, generations):
@@ -99,13 +98,13 @@ def main(data, labels, attrs, names, generations=50, pop_size=100, cxpb=0.5, mut
             ind.fitness.values = fit
 
         # Record generational log
-        logbook.record(gen=g, **stats.compile(pop))
+        logbook.record(gen=g, best=hof[0].fitness.getValues(), **stats.compile(pop))
         print(logbook.stream)
 
         # Replace population, update HoF
         pop[:] = nextgen
         hof.update(pop)
-    return hof[1], logbook
+    return hof[0], logbook
 
 
 if __name__ == "__main__":
@@ -118,5 +117,5 @@ if __name__ == "__main__":
 
     # Evolve population, then draw descent & trees
     best, logs = main(winered_data, winered_target, winered_data.shape[1], winered.columns.drop(['quality']))
-    shared.draw_descent(logs, measure='min')
+    shared.draw_descent(logs, measure='best', method='standard GP')
     shared.draw_solution(best)
