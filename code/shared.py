@@ -10,6 +10,7 @@ import operator as op
 import numpy as np
 import matplotlib.pyplot as plot
 import random as rand
+from datetime import datetime # for naming ephemerals between runs
 import networkx     # used for plotting trees
 
 seeds = [142277182054, 768566379036, 811713195269, 916455223607, 858239192469, 113657088192, 501361380679, 728967379070,
@@ -116,7 +117,7 @@ def create_primitives(names, attrs=1):
     :return: terminal_function_set, the generated primitive set
     """
     terminal_function_set = gp.PrimitiveSet(name="PSET", arity=attrs)
-    terminal_function_set.addEphemeralConstant(name="PSET", ephemeral=lambda: rand.uniform(-1.0, 1.0))
+    terminal_function_set.addEphemeralConstant(name="PSET"+str(datetime.now()), ephemeral=lambda: rand.uniform(-1.0, 1.0))
     terminal_function_set.addPrimitive(op.add, 2)
     terminal_function_set.addPrimitive(op.sub, 2)
     terminal_function_set.addPrimitive(op.mul, 2)
