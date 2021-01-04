@@ -48,9 +48,14 @@ def create_definitions(tb, pset):
     return
 
 
-def main(data, labels, names, generations=50, pop_size=100, cxpb=0.5, mutpb=0.1):
+def evolve(data, labels, names, tdata, tlabels, generations=50, pop_size=100, cxpb=0.5, mutpb=0.1):
     """
     Performs the setup for the main evolutionary process
+    :param data: training data to use during evolution
+    :param labels: target variables for the training data
+    :param names: names for primitives of the data, used for constructing the primitive set
+    :param tdata: testing data used during solution evaluation
+    :param tlabels: target variables for the testing data
 
     :return: the best individual of the evolution & the log
     """
@@ -122,17 +127,3 @@ def main(data, labels, names, generations=50, pop_size=100, cxpb=0.5, mutpb=0.1)
         # Update Transient Terminal Set after each generation
         transient.update_set(pop, g)
     return hof[0], logbook
-
-
-if __name__ == "__main__":
-    # Load wine data
-    path = os.path.relpath('..\\data\\winequality-red.csv', os.path.dirname(__file__))
-
-    winered = pandas.read_csv(path, sep=";")
-    winered_data = winered.drop(['quality'], axis=1).values
-    winered_target = winered['quality'].values
-
-    # Evolve population, then draw descent & trees
-    best, logs = main(winered_data, winered_target, winered_data.shape[1], winered.columns.drop(['quality']))
-    shared.draw_descent(logs, measure='best', method="TTS GP")
-    shared.draw_solution(best)

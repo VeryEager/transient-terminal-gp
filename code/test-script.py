@@ -16,23 +16,25 @@ if __name__ == "__main__":
     # Load red wine data
     path = os.path.relpath('..\\data\\winequality-red.csv', os.path.dirname(__file__))
     dataset = pd.read_csv(path, sep=";")
-    data = dataset.drop(['quality'], axis=1).values
-    target = dataset['quality'].values
 
     tts_log = []
     tts_best = []
     # Perform experiments over seeds
-    for seed in shared.seeds:
+    for i, seed in enumerate(shared.seeds):
         rand.seed(seed)
 
         # Split into training & test sets
-        train, test = skms.train_test_split(data, test_size=0.2, train_size=0.8, random_state=seed)
-        train_target, test_target = skms.train_test_split(target, test_size=0.2, train_size=0.8, random_state=seed)
+        train, test = skms.train_test_split(dataset, test_size=0.2, train_size=0.8, random_state=seed)
+        train_data = train.drop(['quality'], axis=1).values
+        train_target = train['quality'].values
+        test_data = test.drop(['quality'], axis=1).values
+        test_target = test['quality'].values
 
-        # Perform Evolution
-        _best, _logs = ttgp.main(data, target, dataset.columns.drop(['quality']))
-        tts_log.append(_logs)
+        # Perform Evolution using Seed
+        _best, _log = ttgp.evolve(train_data, train_target, dataset.columns.drop(['quality']), test_data, test_target)
+        tts_log.append(_log)
         tts_best.append(_best)
+        print("FINISHED EVOLUTION OF GENERATION: ", i)
         break
 
     # Average the results & report descent & best individual.

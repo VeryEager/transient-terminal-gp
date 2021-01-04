@@ -10,8 +10,8 @@ import operator as op
 import numpy as np
 import matplotlib.pyplot as plot
 import random as rand
-from datetime import datetime # for naming ephemerals between runs
-import networkx     # used for plotting trees
+from datetime import datetime  # used for naming ephemerals across runs
+import networkx                # used for plotting trees
 
 seeds = [39256911, 933855996, 967670959, 968137054, 590138938, 297331027, 755510051, 692539982, 955575529, 462966506,
          575520985, 614618594, 689935942, 638114944, 691154779, 224772871, 822094948, 811947924, 259107591, 784778275,
