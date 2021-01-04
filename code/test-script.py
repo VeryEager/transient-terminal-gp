@@ -10,22 +10,30 @@ import ttgp
 import pandas as pd
 import standardgp as sgp
 import numpy as np
+import sklearn.model_selection as skms
 
 if __name__ == "__main__":
-    # Load wine data
+    # Load red wine data
     path = os.path.relpath('..\\data\\winequality-red.csv', os.path.dirname(__file__))
-    winered = pd.read_csv(path, sep=";")
-    winered_data = winered.drop(['quality'], axis=1).values
-    winered_target = winered['quality'].values
+    dataset = pd.read_csv(path, sep=";")
+    data = dataset.drop(['quality'], axis=1).values
+    target = dataset['quality'].values
 
     tts_log = []
     tts_best = []
     # Perform experiments over seeds
     for seed in shared.seeds:
         rand.seed(seed)
-        _best, logs = sgp.main(winered_data, winered_target, winered_data.shape[1], winered.columns.drop(['quality']))
-        tts_log.append(logs)
+
+        # Split into training & test sets
+        train, test = skms.train_test_split(data, test_size=0.2, train_size=0.8, random_state=seed)
+        train_target, test_target = skms.train_test_split(target, test_size=0.2, train_size=0.8, random_state=seed)
+
+        # Perform Evolution
+        _best, _logs = ttgp.main(data, target, dataset.columns.drop(['quality']))
+        tts_log.append(_logs)
         tts_best.append(_best)
+        break
 
     # Average the results & report descent & best individual.
     # TODO: There should be a cleaner way to achieve this.
@@ -39,5 +47,5 @@ if __name__ == "__main__":
     averaged = pd.DataFrame(d)  # This collects the average over the runs at each generation
     averaged = [{'gen': entry[0], 'best':entry[1][1]} for entry in averaged.iterrows()]
 
-    shared.draw_descent(averaged, measure='best', method="TTS GP, 30 runs")
-    shared.draw_solution(tts_best[10])  # for seed 718695369195
+    shared.draw_descent(averaged, measure='best', method="Standard MOGP, 50 runs")
+    shared.draw_solution(tts_best[0])

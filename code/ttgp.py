@@ -48,7 +48,7 @@ def create_definitions(tb, pset):
     return
 
 
-def main(data, labels, attrs, names, generations=50, pop_size=100, cxpb=0.5, mutpb=0.1):
+def main(data, labels, names, generations=50, pop_size=100, cxpb=0.5, mutpb=0.1):
     """
     Performs the setup for the main evolutionary process
 
