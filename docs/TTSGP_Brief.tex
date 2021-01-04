@@ -22,7 +22,7 @@
 \section{Overview of Work \& Research}
 \paragraph{} Work began on the project with research into previous approaches for improving the interpretability of Symbolic Regression models, and ultimately Multi-objective GP (MOGP) was selected as an area for further study. Several relevant papers defined the interpretability of a solution as the depth or size of its tree representation, which may not accurately correlate to its computational complexity. Thus, it was decided that a new measure of complexity be developed for use in MOGP. In addition, the entirely random nature of mutation operators in MOGP was identified as a place for potential innovation in improving Symbolic Regression model interpretability. This resulted in a new approach being developed called the \textbf{Transient Terminal Set}, which is described in further detail in \textbf{Section 2}.
 \paragraph{} Aside from research, extensive time was invested into learning the tools required for the completion of the project objectives - particularly Python, DEAP, and LaTeX. This involved practical applications in the form of tutorials and implementing a standard MOGP and culminated in the formal definition of the Transient Terminal Set algorithm (see \textbf{Section 2}) and its implementation using DEAP (see \textbf{Section 3}). 
-\paragraph{}The total hours spent on the project, as of 15 December 2020, were \textbf{135}.
+\paragraph{}The total hours spent on the project, as of 4 January 2021, were \textbf{175}.
 
 %Basically the algorithm contained in TTSGP_Algorithm, with some minor formatting adjustments
 \section{Transient Terminal Set}
@@ -62,35 +62,36 @@
 \section{Experimentation Results}
 \paragraph{Note:} The code for this experiment can be accessed at \url{https://github.com/VeryEager/transient-terminal-gp}, and the data utilized is freely accessible at \url{https://archive.ics.uci.edu/ml/datasets/wine+quality}.
 \begin{figure}[H]
-	\caption{Evolution using Standard GP}
+	\caption{Evolution using Standard MOGP}
 	\centering
-	\includegraphics[width=0.5\textwidth]{Figure_1}
+	\includegraphics[width=0.55\textwidth]{Figure_1}
 \end{figure}
 \begin{figure}[H]
 	\caption{Evolution using Transient Terminal Set GP}
 	\centering
-	\includegraphics[width=0.5\textwidth]{Figure_3}
+	\includegraphics[width=0.55\textwidth]{Figure_3}
 \end{figure}
 \begin{figure}[H]
-	\caption{Best individual in Standard GP Evolution}
+	\caption{Best individual in Standard MOGP Evolution}
 	\centering
 	\includegraphics[width=0.6\textwidth]{Figure_2}
 \end{figure}
 \begin{figure}[H]
 	\caption{Best individual in TTSGP Evolution}
 	\centering
-	\includegraphics[width=0.9\textwidth]{Figure_4}
+	\includegraphics[width=0.6\textwidth]{Figure_4}
 \end{figure}
-\paragraph{} The parameters for the experiment were \textit{generations = 50}, \textit{population = 100}, \textit{crossover probability = 0.5}, \textit{mutation probability = 0.1}, and \textit{transient mutation probability = 0.05}. The results of this experiment indicate that TTSGP is competitive with standard MOGP in terms of accuracy (see \textbf{Figures 3} \textbf{4}), however does not reduce the tree depth of candidate solutions. As shown in \textbf{Figure 1} and \textbf{Figure 2}, TTSGP achieves a better accuracy in terms of rmse, however the best candidate solutions are approximately five times as complex (on average). Upon investigation I believe this behavior is caused by two factors: the selection process for members of the Transient Terminal Set, which is extremely strict and causes very few subtrees to be identified as improvements, as well as the absence of dynamic mutation probabilities for nodes in a candidate solution, which results in large subtrees being mutated deep into preexisting subtrees.
+\paragraph{} The parameters for the experiment were \textit{generations = 50}, \textit{population = 100}, \textit{crossover probability = 0.5}, \textit{mutation probability = 0.1}, and \textit{transient mutation probability = 0.05}. Results for the techniques were averaged across 30 random seeds, and are plotted in \textbf{Figure 1} and \textbf{Figure 2}. \textbf{Figure 3} and \textbf{Figure 4} are the generated solutions for one of the runs, with seed 718695369195, and serve as an example of generated symbolic regression trees for both techniques. A full list of the seeds can be obtained from the file \textit{shared.py} in the aforementioned git repository. 
+\paragraph{} The initial results in \textbf{Figures 1 \& 2} demonstrate some improvement in interpretability when using TTSGP over Standard MOGP. Both techniques achieve a similar accuracy metric at the 50th generation, at an RMSE of $\approx$0.98, however the average complexity (tree depth) of a solution generated using TTSGP is $\approx$0.29 smaller than those generated during Standard MOGP. While this improvement is minor, it invites further inquiry into the performance of TTSGP on other data to determine whether this improvement is dataset-specific or a global improvement over Standard MOGP.
 
 %From the ideas document
 \section{Intended Future Work}
-While the majority of the Transient Terminal Set algorithm has been implemented in DEAP, there are several noteworthy aspects which will be further developed or implemented to improve the results of TTSGP. \begin{itemize}
-	\item First, pruning of the set will be fully implemented to ensure only relevant solutions are distributed during transient mutation.
-	\item Second, the criteria for a subtree to be added to the set will be adjusted, as the mean approach is susceptible to outliers. Experimentation will be done to investigate which alternative (median, percentile, etc) is best suited for this problem.
-	\item Third, as mentioned in \textbf{Section 1}, a more appropriate measure of model complexity will be created to ensure candidate solutions in TTSGP are actually less complex than those generated in standard GP.
-	\item Fourth, further research and experimentation into the \textit{probability of node insertion} and \textit{probability of a terminal} during mutation will be performed, as these concepts are closely linked with the Transient Terminal Set.
-	\item Fifth, various bugfixes will be performed to ensure the implementation functions as intended.
+While the majority of the Transient Terminal Set algorithm has been already implemented in Python, there are several noteworthy aspects which need to be further investigated or developed to improve the results of TTSGP experimentation. \begin{itemize}
+	\item As mentioned in \textbf{Section 3}, further research must be done into the effectiveness of the TTSGP approach. This will take the form of investigating the improvement of TTSGP over Standard MOGP on other common regression datasets.
+	\item Second, the criteria for a subtree to be added to the set will be adjusted, as the currently-implemented mean approach is very susceptible to outliers. Experimentation will be performed to investigate which alternative (median, percentile, etc) is best suited for this problem.
+	\item Third, as mentioned in \textbf{Section 1}, a more appropriate measure of model complexity will be created to ensure candidate solutions in TTSGP are actually less complex than those generated in standard MOGP.
+	\item Fourth, further research and experimentation into the \textit{probability of node insertion} and \textit{probability of terminal selection during transient mutation} will be undertaken, as these concepts are closely linked with the Transient Terminal Set.
 \end{itemize}
+As of \textbf{1/4/20}, major bugfixes and general improvements to the project code have been made and rendered the initial results, presented on 12/15/2020, irrelevant.
 
 \end{document}
