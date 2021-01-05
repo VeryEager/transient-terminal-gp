@@ -3,16 +3,17 @@ Contains functions shared by both standard & modified MOGP.
 
 Written by Asher Stout, 300432820
 """
-from sklearn.metrics import mean_squared_error
-from networkx.drawing.nx_agraph import graphviz_layout
-from deap import gp
+import networkx                # for plotting trees
 import operator as op
 import numpy as np
 import matplotlib.pyplot as plot
 import random as rand
-from datetime import datetime  # for naming identical ephemeral constants between runs
-import networkx                # for plotting trees
-import os.path                 # for saving figures to a directory post-run
+from deap import gp
+from pathlib import Path                 # for saving figures to a directory post-run
+from datetime import datetime            # for naming identical ephemeral constants between runs
+from networkx.drawing.nx_agraph import graphviz_layout
+from sklearn.metrics import mean_squared_error
+
 
 seeds = [39256911, 933855996, 967670959, 968137054, 590138938, 297331027, 755510051, 692539982, 955575529, 462966506,
          575520985, 614618594, 689935942, 638114944, 691154779, 224772871, 822094948, 811947924, 259107591, 784778275,
@@ -75,12 +76,12 @@ def draw_solution(individual, show=False, fname='solution'):
 
     pos = graphviz_layout(graph, prog="dot")
     networkx.draw_networkx_nodes(graph, pos, node_size=0)
-    networkx.draw_networkx_edges(graph, pos, alpha=0.3)
-    networkx.draw_networkx_labels(graph, pos, label, font_size=14,font_family="Times New Roman",font_weight="bold")
+    networkx.draw_networkx_edges(graph, pos, alpha=0.3, edge_color='#1338BE')
+    networkx.draw_networkx_labels(graph, pos, label, font_size=9,font_family="Times New Roman",font_weight="bold")
     plot.title(label="Training Fitness: " + str(individual.fitness.values[0]) + " " + str(individual.fitness.values[1]))
 
     # Save the figure & display the plot
-    path = os.path.relpath('..\\docs\\Figures\\' + fname, os.path.dirname(__file__))
+    path = Path.cwd() / '..' / 'docs' / 'Figures' / fname
     plot.savefig(fname=path)
     if show:
         plot.show()
@@ -118,7 +119,7 @@ def draw_descent(logs, measure, method, show=False, fname='descent'):
     fig.tight_layout()
 
     # Save the figure & display the plot
-    path = os.path.relpath('..\\docs\\Figures\\'+fname+'-'+method, os.path.dirname(__file__))
+    path = Path.cwd() / '..' / 'docs' / 'Figures' / str(fname + '-' + method)
     plot.savefig(fname=path)
     if show:
         plot.show()

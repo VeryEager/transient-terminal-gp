@@ -7,12 +7,12 @@ Written by Asher Stout, 300432820
 import sys
 import ttgp
 import shared
-import os.path
 import pandas as pd
 import random as rand
 import standardgp as sgp
 import numpy as np
 import sklearn.model_selection as skms
+from pathlib import Path    # supports inter-OS relative path
 
 if __name__ == "__main__":
     """
@@ -21,11 +21,9 @@ if __name__ == "__main__":
     arg2: name of the dataset's target variable 
     
     """
-    #
     # Load red wine data
-    path = '..\\data\\'+sys.argv[1]+'.csv'
-    path = os.path.relpath(path, os.path.dirname(__file__))
-    dataset = pd.read_csv(path, sep=";")
+    path = Path.cwd() / '..' / 'data' / str(sys.argv[1] + '.csv')
+    dataset = pd.read_csv(path.resolve(), sep=";")
     target = sys.argv[2]
 
     tts_log = []
@@ -42,7 +40,7 @@ if __name__ == "__main__":
         test_target = test[target].values
 
         # Perform Evolution using Seed
-        _best, _log = ttgp.evolve(train_data, train_target, dataset.columns.drop(['quality']), test_data, test_target)
+        _best, _log = sgp.evolve(train_data, train_target, dataset.columns.drop(['quality']), test_data, test_target)
         tts_log.append(_log)
         tts_best.append(_best)
         print("FINISHED EVOLUTION OF GENERATION: ", i)
@@ -59,6 +57,6 @@ if __name__ == "__main__":
     averaged = pd.DataFrame(d)  # This collects the average over the runs at each generation
     averaged = [{'gen': entry[0], 'best':entry[1][1]} for entry in averaged.iterrows()]
 
-    shared.draw_descent(averaged, measure='best', method="TTSGP", fname=sys.argv[1]+'-evo')
-    shared.draw_solution(tts_best[0], fname=sys.argv[1]+'TTSGP-ex')  # TODO: Use the best overall solution, not a random
+    shared.draw_descent(averaged, measure='best', method="MOGP", fname=sys.argv[1]+'-evo')
+    shared.draw_solution(tts_best[0], fname=sys.argv[1]+'-MOGP-ex')  # TODO: Use the best overall solution, not a random
 
