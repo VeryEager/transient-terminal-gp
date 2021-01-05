@@ -3,20 +3,30 @@ Test script for gauging the performance of TTSGP versus standard GP
 
 Written by Asher Stout, 300432820
 """
-import random as rand
-import os.path
-import shared
+
+import sys
 import ttgp
+import shared
+import os.path
 import pandas as pd
+import random as rand
 import standardgp as sgp
 import numpy as np
 import sklearn.model_selection as skms
 
 if __name__ == "__main__":
+    """
+    README: accepts two command line arguments
+    arg1: name of dataset (in .csv format) to evaluate
+    arg2: name of the dataset's target variable 
+    
+    """
+    #
     # Load red wine data
-    path = os.path.relpath('..\\data\\winequality-red.csv', os.path.dirname(__file__))
+    path = '..\\data\\'+sys.argv[1]+'.csv'
+    path = os.path.relpath(path, os.path.dirname(__file__))
     dataset = pd.read_csv(path, sep=";")
-    target = 'quality'
+    target = sys.argv[2]
 
     tts_log = []
     tts_best = []
