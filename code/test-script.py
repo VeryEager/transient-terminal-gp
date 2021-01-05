@@ -42,7 +42,7 @@ if __name__ == "__main__":
         test_target = test[target].values
 
         # Perform Evolution using Seed
-        _best, _log = sgp.evolve(train_data, train_target, dataset.columns.drop(['quality']), test_data, test_target)
+        _best, _log = ttgp.evolve(train_data, train_target, dataset.columns.drop(['quality']), test_data, test_target)
         tts_log.append(_log)
         tts_best.append(_best)
         print("FINISHED EVOLUTION OF GENERATION: ", i)
@@ -59,5 +59,6 @@ if __name__ == "__main__":
     averaged = pd.DataFrame(d)  # This collects the average over the runs at each generation
     averaged = [{'gen': entry[0], 'best':entry[1][1]} for entry in averaged.iterrows()]
 
-    shared.draw_descent(averaged, measure='best', method="Standard MOGP, 50 runs")
-    shared.draw_solution(tts_best[22])  # TODO: Use the best overall solution, not random solution
+    shared.draw_descent(averaged, measure='best', method="TTSGP", fname=sys.argv[1]+'-evo')
+    shared.draw_solution(tts_best[0], fname=sys.argv[1]+'TTSGP-ex')  # TODO: Use the best overall solution, not a random
+

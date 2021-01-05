@@ -10,8 +10,9 @@ import operator as op
 import numpy as np
 import matplotlib.pyplot as plot
 import random as rand
-from datetime import datetime  # used for naming ephemerals across runs
-import networkx                # used for plotting trees
+from datetime import datetime  # for naming identical ephemeral constants between runs
+import networkx                # for plotting trees
+import os.path                 # for saving figures to a directory post-run
 
 seeds = [39256911, 933855996, 967670959, 968137054, 590138938, 297331027, 755510051, 692539982, 955575529, 462966506,
          575520985, 614618594, 689935942, 638114944, 691154779, 224772871, 822094948, 811947924, 259107591, 784778275,
@@ -57,12 +58,14 @@ def eval_solution(function, data, actual, _tb):
     return accuracy, complexity,
 
 
-def draw_solution(individual):
+def draw_solution(individual, show=False, fname='solution'):
     """
     Displays a connected tree representing an individual. Presumably this individual scores highly in the population
     using the method eval_solution.
 
     :param individual: the individual (represented as a tree) to draw
+    :param show: whether to display the figure after saving
+    :param fname: file name of the figure
     :return:
     """
     graph = networkx.Graph()
@@ -71,25 +74,33 @@ def draw_solution(individual):
     graph.add_nodes_from(node)
 
     pos = graphviz_layout(graph, prog="dot")
-    networkx.draw_networkx_nodes(graph, pos)
-    networkx.draw_networkx_edges(graph, pos)
-    networkx.draw_networkx_labels(graph, pos, label)
+    networkx.draw_networkx_nodes(graph, pos, node_size=0)
+    networkx.draw_networkx_edges(graph, pos, alpha=0.3)
+    networkx.draw_networkx_labels(graph, pos, label, font_size=14,font_family="Times New Roman",font_weight="bold")
     plot.title(label="Training Fitness: " + str(individual.fitness.values[0]) + " " + str(individual.fitness.values[1]))
-    plot.show()
+
+    # Save the figure & display the plot
+    path = os.path.relpath('..\\docs\\Figures\\' + fname, os.path.dirname(__file__))
+    plot.savefig(fname=path)
+    if show:
+        plot.show()
+    plot.clf()
 
 
-def draw_descent(logs, measure, method):
+def draw_descent(logs, measure, method, show=False, fname='descent'):
     """
     Plots the accuracy of a selected measure over generations, for both accuracy and complexity
 
     :param logs: the logbook from the main execution
     :param measure: the measure to plot from the logbook
     :param method: method used, in string format
+    :param show: whether to display the figure after saving
+    :param fname: file name of the figure
     :return:
     """
     # Create plot, add titles & initialize the axes axis
     fig, ax1 = plot.subplots()
-    fig.suptitle("Accuracy & Complexity of " + measure + " solution during evolution: " + method)
+    fig.suptitle("Accuracy & Complexity of " + measure + " solution during evolution: " + method + ", 50 runs")
     fig.tight_layout()
     ax1.set_xlabel('generation')
     ax2 = ax1.twinx()
@@ -104,9 +115,14 @@ def draw_descent(logs, measure, method):
     ax2.set_ylabel('complexity (tree depth)', color="#191970")
     ax2.plot(xax, list(log[measure][1] for log in logs), color='#191970', alpha=0.6)
     ax2.tick_params(axis='y', labelcolor="#191970")
-
     fig.tight_layout()
-    plot.show()
+
+    # Save the figure & display the plot
+    path = os.path.relpath('..\\docs\\Figures\\'+fname+'-'+method, os.path.dirname(__file__))
+    plot.savefig(fname=path)
+    if show:
+        plot.show()
+    plot.clf()
 
 
 def create_primitives(names, attrs=1):
