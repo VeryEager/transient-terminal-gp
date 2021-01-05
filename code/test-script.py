@@ -16,6 +16,7 @@ if __name__ == "__main__":
     # Load red wine data
     path = os.path.relpath('..\\data\\winequality-red.csv', os.path.dirname(__file__))
     dataset = pd.read_csv(path, sep=";")
+    target = 'quality'
 
     tts_log = []
     tts_best = []
@@ -24,18 +25,17 @@ if __name__ == "__main__":
         rand.seed(seed)
 
         # Split into training & test sets
-        train, test = skms.train_test_split(dataset, test_size=0.2, train_size=0.8, random_state=seed)
-        train_data = train.drop(['quality'], axis=1).values
-        train_target = train['quality'].values
-        test_data = test.drop(['quality'], axis=1).values
-        test_target = test['quality'].values
+        train, test = skms.train_test_split(dataset, test_size=0.3, train_size=0.7, random_state=seed)
+        train_data = train.drop([target], axis=1).values
+        train_target = train[target].values
+        test_data = test.drop([target], axis=1).values
+        test_target = test[target].values
 
         # Perform Evolution using Seed
-        _best, _log = ttgp.evolve(train_data, train_target, dataset.columns.drop(['quality']), test_data, test_target)
+        _best, _log = sgp.evolve(train_data, train_target, dataset.columns.drop(['quality']), test_data, test_target)
         tts_log.append(_log)
         tts_best.append(_best)
         print("FINISHED EVOLUTION OF GENERATION: ", i)
-        break
 
     # Average the results & report descent & best individual.
     # TODO: There should be a cleaner way to achieve this.
@@ -50,4 +50,4 @@ if __name__ == "__main__":
     averaged = [{'gen': entry[0], 'best':entry[1][1]} for entry in averaged.iterrows()]
 
     shared.draw_descent(averaged, measure='best', method="Standard MOGP, 50 runs")
-    shared.draw_solution(tts_best[0])
+    shared.draw_solution(tts_best[22])  # TODO: Use the best overall solution, not random solution

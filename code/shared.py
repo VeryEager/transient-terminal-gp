@@ -36,20 +36,20 @@ def protected_division(x, y):
         return x/y
 
 
-def eval_solution(function, tb, data, actual):
+def eval_solution(function, data, actual, _tb):
     """
-    Evaluates the MSE and complexity of a candidate solution.
+    Evaluates the RMSE and complexity of a candidate solution.
 
     :param function: the candidate solution to evaluate
-    :param tb: toolbox reference
     :param data: points to evaluate on
     :param actual: the correct predictions for the data
+    :param _tb:
     :return: a tuple of fitnesses
     """
     if function is None:    # In exceptional circumstances only
         return np.Infinity, np.Infinity,
 
-    func = tb.compile(expr=function)
+    func = _tb.compile(expr=function)
     results = [func(*res) for res in data]
 
     accuracy = mean_squared_error(actual, results, squared=False)
@@ -74,7 +74,7 @@ def draw_solution(individual):
     networkx.draw_networkx_nodes(graph, pos)
     networkx.draw_networkx_edges(graph, pos)
     networkx.draw_networkx_labels(graph, pos, label)
-    plot.title(individual.fitness.values)
+    plot.title(label="Training Fitness: " + str(individual.fitness.values[0]) + " " + str(individual.fitness.values[1]))
     plot.show()
 
 

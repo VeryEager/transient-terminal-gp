@@ -36,7 +36,7 @@ def create_definitions(tb, pset):
 
     # Register selection, evaluation, compiliation
     tb.register("selection", tools.selNSGA2)
-    tb.register("evaluation", shared.eval_solution, tb=tb)
+    tb.register("evaluation", shared.eval_solution, _tb=tb)
     tb.register("compile", gp.compile, pset=pset)
     return
 
@@ -75,8 +75,7 @@ def evolve(data, labels, names, tdata, tlabels, generations=50, pop_size=100, cx
         ind.fitness.values = fit
 
     hof.update(pop)
-    print(hof[0].fitness.getValues())
-    logbook.record(gen=0, best=hof[0].fitness.getValues(), **stats.compile(pop))
+    logbook.record(gen=0, best=toolbox.evaluation(function=hof[0], data=tdata, actual=tlabels), **stats.compile(pop))
     print(logbook.stream)
 
     # Begin evolution of population
@@ -103,7 +102,8 @@ def evolve(data, labels, names, tdata, tlabels, generations=50, pop_size=100, cx
             ind.fitness.values = fit
 
         # Record generational log
-        logbook.record(gen=g, best=hof[0].fitness.getValues(), **stats.compile(pop))
+        logbook.record(gen=g, best=toolbox.evaluation(function=hof[0], data=tdata, actual=tlabels),
+                       **stats.compile(pop))
         print(logbook.stream)
 
         # Replace population, update HoF
