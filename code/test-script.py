@@ -16,14 +16,15 @@ from pathlib import Path    # supports inter-OS relative path
 
 if __name__ == "__main__":
     """
-    README: accepts two command line arguments
+    README: accepts three command line arguments
     arg1: name of dataset (in .csv format) to evaluate
     arg2: name of the dataset's target variable 
+    arg3: separator character (usually ';' or ',' - CHECK DATASET PRIOR
     
     """
     # Load red wine data
     path = Path.cwd() / '..' / 'data' / str(sys.argv[1] + '.csv')
-    dataset = pd.read_csv(path.resolve(), sep=";")
+    dataset = pd.read_csv(path.resolve(), sep=sys.argv[3])
     target = sys.argv[2]
 
     tts_log = []
@@ -40,7 +41,7 @@ if __name__ == "__main__":
         test_target = test[target].values
 
         # Perform Evolution using Seed
-        _best, _log = sgp.evolve(train_data, train_target, dataset.columns.drop(['quality']), test_data, test_target)
+        _best, _log = ttgp.evolve(train_data, train_target, dataset.columns.drop([target]), test_data, test_target)
         tts_log.append(_log)
         tts_best.append(_best)
         print("FINISHED EVOLUTION OF GENERATION: ", i)

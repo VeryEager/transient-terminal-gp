@@ -49,6 +49,10 @@ def evolve(data, labels, names, tdata, tlabels, generations=50, pop_size=100, cx
     :param names: names for primitives of the data, used for constructing the primitive set
     :param tdata: testing data used during solution evaluation
     :param tlabels: target variables for the testing data
+    :param generations: number of generations
+    :param pop_size: population size
+    :param cxpb: crossover probability
+    :param mutpb: mutation probability
 
     :return: the best individual of the evolution & the log
     """

@@ -48,7 +48,7 @@ def create_definitions(tb, pset):
     return
 
 
-def evolve(data, labels, names, tdata, tlabels, generations=50, pop_size=100, cxpb=0.5, mutpb=0.1):
+def evolve(data, labels, names, tdata, tlabels, generations=50, pop_size=100, cxpb=0.5, mutpb=0.1, tmutpb=0.1):
     """
     Performs the setup for the main evolutionary process
     :param data: training data to use during evolution
@@ -56,6 +56,11 @@ def evolve(data, labels, names, tdata, tlabels, generations=50, pop_size=100, cx
     :param names: names for primitives of the data, used for constructing the primitive set
     :param tdata: testing data used during solution evaluation
     :param tlabels: target variables for the testing data
+    :param generations: number of generations
+    :param pop_size: population size
+    :param cxpb: crossover probability
+    :param mutpb: mutation probability
+    :param tmutpb: transient mutation probability
 
     :return: the best individual of the evolution & the log
     """
@@ -106,7 +111,7 @@ def evolve(data, labels, names, tdata, tlabels, generations=50, pop_size=100, cx
 
         # Perform transient mutation
         for ind in nextgen:
-            if (rand.random() < mutpb) and (transient.trans_count >= 1):
+            if (rand.random() < tmutpb) and (transient.trans_count >= 1):
                 toolbox.transient_mutate(ind)
                 del ind.fitness.values
 
