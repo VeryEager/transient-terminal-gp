@@ -6,6 +6,7 @@ Written by Asher Stout, 300432820
 """
 
 import sys
+import time
 import ttgp
 import shared
 import pandas as pd
@@ -52,6 +53,28 @@ def draw_mutation_descents(logs, measure, method, show=False, fname='descent'):
     plot.clf()
 
 
+def draw_time_ascent(logs, probabilities):
+    """
+    Draws the time of calculation for/e probability run of TTSGP
+
+    :param logs: the time logs, a collection of floats
+    :param probabilities:
+    :return:
+    """
+    fig, ax1 = plot.subplots()
+    fig.suptitle("Execution time for each TTSGP run in [0.05, 1.0]")
+    fig.tight_layout()
+    ax1.set_xlabel('transient mutation probability')
+    ax1.set_ylabel('execution time (seconds)')
+    ax1.tick_params(axis='y')
+    ax1.plot(probabilities, logs, color="#B90E0A", alpha=0.6)
+
+    # Save the figure
+    path = Path.cwd() / '..' / 'docs' / 'Figures' / 'ttsgp-probabilities-times'
+    plot.savefig(fname=path)
+    plot.clf()
+
+
 if __name__ == "__main__":
     """
     README: accepts three command line arguments
@@ -66,9 +89,11 @@ if __name__ == "__main__":
     target = sys.argv[2]
 
     prob_logs = []
-    for prob in np.arange(0.05, 1.0, 0.05):
+    time_logs = []
+    for prob in np.arange(0.05, 1.0, 0.1):
         tts_log = []
         tts_best = []
+        start_time = time.time()
         # Perform experiments over seeds
         for i, seed in enumerate(shared.seeds):
             rand.seed(seed)
@@ -85,9 +110,10 @@ if __name__ == "__main__":
                                       tmutpb=prob)
             tts_log.append(_log)
             tts_best.append(_best)
-            print("FINISHED EVOLUTION OF GENERATION: ", i)
+            print("FINISHED EVOLUTION OF POPULATION: ", i)
             if i == 1:
                 break
+        time_logs.append(time.time()-start_time)
 
         # Average the results & report descent & best individual.
         # TODO: There should be a cleaner way to achieve this.
