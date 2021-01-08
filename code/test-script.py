@@ -58,6 +58,6 @@ if __name__ == "__main__":
     averaged = pd.DataFrame(d)  # This collects the average over the runs at each generation
     averaged = [{'gen': entry[0], 'best':entry[1][1]} for entry in averaged.iterrows()]
 
-    shared.draw_descent(averaged, measure='best', method="MOGP", fname=sys.argv[1]+'-evo')
-    shared.draw_solution(tts_best[0], fname=sys.argv[1]+'-MOGP-ex')  # TODO: Use the best overall solution, not a random
+    shared.draw_descent(averaged, measure='best', method="TTSGP", fname=sys.argv[1]+'-evo')
+    shared.draw_solution(tts_best[0], fname=sys.argv[1]+'-TTSGP-ex')  # TODO: Use the best overall solution, not a random
 

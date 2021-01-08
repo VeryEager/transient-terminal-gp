@@ -31,8 +31,8 @@ def draw_mutation_descents(logs, measure, method, show=False, fname='descent'):
     :return:
     """
     # Create plot, add titles & initialize the axes
-    fig, ax1 = plot.subplots()
-    fig.suptitle("Complexity of TTSGP solutions: transient mutation probability [0.05, 0.25]")
+    fig, ax1 = plot.subplots(figsize=(10, 6))
+    fig.suptitle("Complexity of best TTSGP solutions (50 runs): tmutpb=[0.00, 0.25]")
     fig.tight_layout()
     ax1.set_xlabel('generation')
     ax1.set_ylabel('complexity (tree depth)')
@@ -41,9 +41,10 @@ def draw_mutation_descents(logs, measure, method, show=False, fname='descent'):
     # Draw all y axis COMPLEXITY
     for mut, color, prob in zip(logs, colors, np.arange(0.0, 0.3, 0.05)):
         xax = list(log['gen'] for log in mut)
-        ax1.plot(xax, list(log[measure][1] for log in mut), color=color, alpha=0.6, label=str("prob = " + str(prob)))
+        ax1.plot(xax, list(log[measure][1] for log in mut), color=color, alpha=0.6, label=str("prob = " +
+                                                                                              str(round(prob, 2))))
 
-    fig.legend(loc="upper left")
+    ax1.legend(loc='center left', bbox_to_anchor=(0.0, 0.85), shadow=False, ncol=1)
     fig.tight_layout()
 
     # Save the figure & display the plot
@@ -63,7 +64,7 @@ def draw_time_ascent(logs, probabilities):
     :return:
     """
     fig, ax1 = plot.subplots()
-    fig.suptitle("Execution time for each TTSGP run in [0.05, 0.25]")
+    fig.suptitle("Execution time for TTSGP (50 runs): tmutpb=[0.00, 0.25]")
     fig.tight_layout()
     ax1.set_xlabel('transient mutation probability')
     ax1.set_ylabel('execution time (seconds)')
@@ -113,7 +114,7 @@ if __name__ == "__main__":
             tts_log.append(_log)
             tts_best.append(_best)
             print("FINISHED EVOLUTION OF POPULATION: ", i)
-            if i == 1:
+            if i == 9:
                 break
         time_logs.append(time.time()-start_time)
 
