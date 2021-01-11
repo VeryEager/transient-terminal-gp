@@ -9,7 +9,8 @@ import ttgp
 import shared
 import pandas as pd
 import random as rand
-import standardgp as sgp
+import standardgp as mogp
+import sgp
 import numpy as np
 import sklearn.model_selection as skms
 from pathlib import Path    # supports inter-OS relative path

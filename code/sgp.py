@@ -1,15 +1,36 @@
 """
-Contains code for the standard GP algorithm using DEAP.
+Contains code for single-objectove GP algorithm using DEAP.
 
 Written by Asher Stout, 300432820
 """
 from deap import base, creator, tools, gp
+from sklearn.metrics import mean_squared_error
 import operator as op
 import random as rand
 import numpy
 import os.path
 import pandas
 import shared
+
+
+def rmse_evaluation(function, data, actual, _tb):
+    """
+    Evaluates the RMSE of a candidate solution. Used for SOGP
+
+    :param function: the candidate solution to evaluate
+    :param data: points to evaluate on
+    :param actual: the correct predictions for the data
+    :param _tb:
+    :return: the accuracy metric, as a tuple
+    """
+    if function is None:  # In exceptional circumstances only
+        return numpy.Infinity,
+
+    func = _tb.compile(expr=function)
+    results = [func(*res) for res in data]
+
+    accuracy = mean_squared_error(actual, results, squared=False)
+    return accuracy,
 
 
 def create_definitions(tb, pset):
@@ -21,8 +42,8 @@ def create_definitions(tb, pset):
     :return:
     """
     # Initialize individual, fitness, and population
-    creator.create("MOFitness", base.Fitness, weights=(-1.0, -1.0))
-    creator.create("Individual", gp.PrimitiveTree, fitness=creator.MOFitness)
+    creator.create("Fitness", base.Fitness, weights=(-1.0,))
+    creator.create("Individual", gp.PrimitiveTree, fitness=creator.Fitness)
     tb.register("initialize", gp.genHalfAndHalf, pset=pset, min_=1, max_=4)
     tb.register("individual", tools.initIterate, container=creator.Individual, generator=tb.initialize)
     tb.register("population", tools.initRepeat, container=list, func=tb.individual)
@@ -35,8 +56,8 @@ def create_definitions(tb, pset):
     tb.decorate("mutate", gp.staticLimit(key=op.attrgetter("height"), max_value=12))
 
     # Register selection, evaluation, compiliation
-    tb.register("selection", tools.selNSGA2)
-    tb.register("evaluation", shared.eval_solution, _tb=tb)
+    tb.register("selection", tools.selTournament)
+    tb.register("evaluation", rmse_evaluation, _tb=tb)
     tb.register("compile", gp.compile, pset=pset)
     return
 
@@ -68,7 +89,7 @@ def evolve(data, labels, names, tdata, tlabels, generations=50, pop_size=100, cx
     stats.register("max", numpy.max, axis=0)
     stats.register("std", numpy.std, axis=0)
     logbook = tools.Logbook()
-    logbook.header = "gen", "min", "mean", "max", "std", "best"
+    logbook.header = "gen", "min", "mean", "max", "std", "best", "bestsize"
 
     # Initialize population & compute initial fitnesses
     pop = toolbox.population(n=pop_size)
@@ -84,7 +105,7 @@ def evolve(data, labels, names, tdata, tlabels, generations=50, pop_size=100, cx
 
     # Begin evolution of population
     for g in range(1, generations):
-        nextgen = toolbox.selection(pop, len(pop))
+        nextgen = toolbox.selection(pop, len(pop), tournsize=10)
         nextgen = [toolbox.clone(ind) for ind in nextgen]
 
         # Perform crossover
@@ -106,7 +127,7 @@ def evolve(data, labels, names, tdata, tlabels, generations=50, pop_size=100, cx
             ind.fitness.values = fit
 
         # Record generational log
-        logbook.record(gen=g, best=toolbox.evaluation(function=hof[0], data=tdata, actual=tlabels),
+        logbook.record(gen=g, best=toolbox.evaluation(function=hof[0], data=tdata, actual=tlabels), bestsize=len(hof[0]),
                        **stats.compile(pop))
         print(logbook.stream)
 

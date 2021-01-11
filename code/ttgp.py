@@ -48,7 +48,7 @@ def create_definitions(tb, pset):
     return
 
 
-def evolve(data, labels, names, tdata, tlabels, generations=50, pop_size=100, cxpb=0.5, mutpb=0.1, tmutpb=0.1):
+def evolve(data, labels, names, tdata, tlabels, generations=50, pop_size=100, cxpb=0.8, mutpb=0.1, tmutpb=0.1):
     """
     Performs the setup for the main evolutionary process
     :param data: training data to use during evolution

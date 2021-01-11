@@ -55,7 +55,7 @@ def eval_solution(function, data, actual, _tb):
     results = [func(*res) for res in data]
 
     accuracy = mean_squared_error(actual, results, squared=False)
-    complexity = function.height
+    complexity = len(function)
     return accuracy, complexity,
 
 
