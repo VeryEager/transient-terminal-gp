@@ -56,28 +56,18 @@ def evolve(data, labels, names, tdata, tlabels, generations=50, pop_size=100, cx
 
     :return: the best individual of the evolution & the log
     """
-    # Initialize toolbox & creator parameters
+    # Initialize toolbox, population, hof, and logs
     toolbox = base.Toolbox()
     primitives = shared.create_primitives(names, data.shape[1])
     create_definitions(toolbox, primitives)
-
-    # Initialize stats & logbook
-    stats = tools.Statistics(lambda ind: ind.fitness.values)
-    stats.register("min", numpy.min, axis=0)
-    stats.register("mean", numpy.mean, axis=0)
-    stats.register("max", numpy.max, axis=0)
-    stats.register("std", numpy.std, axis=0)
-    logbook = tools.Logbook()
-    logbook.header = "gen", "min", "mean", "max", "std", "best"
-
-    # Initialize population & compute initial fitnesses
+    stats, logbook = shared.init_logger("gen", "best")
     pop = toolbox.population(n=pop_size)
     hof = tools.ParetoFront()
 
+    # Update initial fitnesses & print log for 0th generation
     fitness = [toolbox.evaluation(function=ind, data=data, actual=labels) for ind in pop]
     for ind, fit in zip([ind for ind in pop if not ind.fitness.valid], fitness):
         ind.fitness.values = fit
-
     hof.update(pop)
     logbook.record(gen=0, best=toolbox.evaluation(function=hof[0], data=tdata, actual=tlabels), **stats.compile(pop))
     print(logbook.stream)
@@ -99,18 +89,14 @@ def evolve(data, labels, names, tdata, tlabels, generations=50, pop_size=100, cx
                 toolbox.mutate(ind)
                 del ind.fitness.values
 
-        # Update fitness
+        # Update fitness & population, update HoF, record generation log
         invalidind = [ind for ind in nextgen if not ind.fitness.valid]
         fitness = [toolbox.evaluation(function=ind, data=data, actual=labels) for ind in invalidind]
         for ind, fit in zip(invalidind, fitness):
             ind.fitness.values = fit
-
-        # Record generational log
         logbook.record(gen=g, best=toolbox.evaluation(function=hof[0], data=tdata, actual=tlabels),
                        **stats.compile(pop))
         print(logbook.stream)
-
-        # Replace population, update HoF
         pop[:] = nextgen
         hof.update(pop)
     return hof[0], logbook

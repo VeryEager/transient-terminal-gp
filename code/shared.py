@@ -8,7 +8,7 @@ import operator as op
 import numpy as np
 import matplotlib.pyplot as plot
 import random as rand
-from deap import gp
+from deap import gp, tools
 from pathlib import Path                 # for saving figures to a directory post-run
 from datetime import datetime            # for naming identical ephemeral constants between runs
 from networkx.drawing.nx_agraph import graphviz_layout
@@ -113,7 +113,7 @@ def draw_descent(logs, measure, method, show=False, fname='descent'):
     ax1.tick_params(axis='y', labelcolor="#800000")
 
     # Draw second y axis COMPLEXITY
-    ax2.set_ylabel('complexity (tree depth)', color="#191970")
+    ax2.set_ylabel('complexity (tree size)', color="#191970")
     ax2.plot(xax, list(log[measure][1] for log in logs), color='#191970', alpha=0.6)
     ax2.tick_params(axis='y', labelcolor="#191970")
     fig.tight_layout()
@@ -146,3 +146,19 @@ def create_primitives(names, attrs=1):
     [n.append(name.replace(" ", "_")) for name in names]
     terminal_function_set.renameArguments(**{'ARG' + str(i) : n[i] for i in range(0, len(names))})
     return terminal_function_set
+
+
+def init_logger(*names):
+    """
+    Initializes the statistics & logbook for tracking across all implementations
+
+    :param names: string names for other variables to intermittenly record
+    :return: a tuple composed of stats and the logbook
+    """
+    stats = tools.Statistics(lambda ind: ind.fitness.values)
+    stats.register("25th percentile", np.percentile, q=25, axis=0)
+    stats.register("median", np.median, axis=0)
+    stats.register("75th percentile", np.percentile, q=75, axis=0)
+    log = tools.Logbook()
+    log.header = names + tuple(stats.fields)
+    return stats, log
