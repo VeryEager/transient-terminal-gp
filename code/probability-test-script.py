@@ -35,7 +35,7 @@ def draw_mutation_descents(logs, measure, method, show=False, fname='descent'):
     fig.suptitle("Complexity of best TTSGP solutions (50 runs): tmutpb=[0.00, 0.25]")
     fig.tight_layout()
     ax1.set_xlabel('generation')
-    ax1.set_ylabel('complexity (tree depth)')
+    ax1.set_ylabel('complexity (tree size)')
     ax1.tick_params(axis='y')
 
     # Draw all y axis COMPLEXITY

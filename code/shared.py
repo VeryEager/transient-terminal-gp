@@ -4,6 +4,7 @@ Contains functions shared by both standard & modified MOGP.
 Written by Asher Stout, 300432820
 """
 import networkx                # for plotting trees
+import sklearn.preprocessing as pre
 import operator as op
 import numpy as np
 import matplotlib.pyplot as plot
@@ -13,6 +14,7 @@ from pathlib import Path                 # for saving figures to a directory pos
 from datetime import datetime            # for naming identical ephemeral constants between runs
 from networkx.drawing.nx_agraph import graphviz_layout
 from sklearn.metrics import mean_squared_error
+from scipy.spatial import distance       # for identifying best balanced solution in a Pareto front
 
 
 seeds = [39256911, 933855996, 967670959, 968137054, 590138938, 297331027, 755510051, 692539982, 955575529, 462966506,
@@ -162,3 +164,19 @@ def init_logger(*names):
     log = tools.Logbook()
     log.header = names + tuple(stats.fields)
     return stats, log
+
+
+def getBalancedInd(pareto, pop):
+    """
+    Retrieves the most balanced individual from a front.
+
+    :param pareto: The pareto front to pull the individual from
+    :param pop: Population to normalize fitness values over
+    :return: the individual
+    """
+    root = (0, 0)  # the conceivably 'best' solution
+    normalized_pop = pre.normalize([ind.fitness.values for ind in pop])
+    normalized_hof = [normalized_pop[pop.index(ind)] for ind in pareto]
+    print(normalized_hof)   # TODO: normalization requires the pareto front be present in the population see Issue #18
+    distances = [distance.euclidean(root, ind.fitness.values) for ind in pareto]
+    return pareto[distances.index(np.min(distances))]
