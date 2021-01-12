@@ -6,9 +6,6 @@ Written by Asher Stout, 300432820
 from deap import base, creator, tools, gp
 import operator as op
 import random as rand
-import numpy
-import os.path
-import pandas
 import shared
 import ttsclasses as tts
 import ttsfunctions as ttsf
@@ -33,13 +30,13 @@ def create_definitions(tb, pset):
 
     # Register genetic operators & decorate bounds
     tb.register("crossover", gp.cxOnePoint)
-    tb.decorate("crossover", gp.staticLimit(key=op.attrgetter("height"), max_value=12))
+    tb.decorate("crossover", gp.staticLimit(key=op.attrgetter('height'), max_value=90))
     tb.register("expr_mut", gp.genFull, min_=1, max_=3)
     tb.register("mutate", gp.mutUniform, expr=tb.expr_mut, pset=pset)
-    tb.decorate("mutate", gp.staticLimit(key=op.attrgetter("height"), max_value=12))
+    tb.decorate("mutate", gp.staticLimit(key=op.attrgetter('height'), max_value=90))
     tb.register("expr_trans_mut", ttsf.genRand)
     tb.register("transient_mutate", ttsf.transientMutUniform, expr=tb.expr_trans_mut, pset=transient)
-    tb.decorate("transient_mutate", gp.staticLimit(key=op.attrgetter("height"), max_value=12))
+    tb.decorate("transient_mutate", gp.staticLimit(key=op.attrgetter('height'), max_value=90))
 
     # Register selection, evaluation, compiliation
     tb.register("selection", tools.selNSGA2)

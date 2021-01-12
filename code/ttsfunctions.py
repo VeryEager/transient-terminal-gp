@@ -3,7 +3,6 @@ Contains general functions for use with a transient terminal set
 
 Written by Asher Stout, 300432820
 """
-from deap import gp
 import random
 
 

@@ -35,7 +35,6 @@ if __name__ == "__main__":
     else:
         print("UNKNOWN METHOD: MUST BE ONE OF (sgp, mogp, ttgp)")
 
-
     # Load red wine data
     path = Path.cwd() / '..' / 'data' / str(sys.argv[1] + '.csv')
     dataset = pd.read_csv(path.resolve(), sep=sys.argv[3])

@@ -6,9 +6,6 @@ Written by Asher Stout, 300432820
 
 from deap.gp import PrimitiveTree, PrimitiveSet, Terminal, Primitive
 from numpy import mean, percentile
-from datetime import datetime
-from collections import defaultdict
-from os.path import commonprefix
 
 
 class TransientTree(PrimitiveTree):
