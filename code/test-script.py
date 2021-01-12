@@ -21,8 +21,21 @@ if __name__ == "__main__":
     arg1: name of dataset (in .csv format) to evaluate
     arg2: name of the dataset's target variable 
     arg3: separator character (usually ';' or ',' - CHECK DATASET PRIOR
+    arg4: string representing the method used. ONE OF: (sgp, mogp, ttsgp)
     
     """
+    # Configure evolutionary method from command-line argument
+    method = sys.argv[4]
+    if method == "sgp":
+        method = sgp
+    elif method == "mogp":
+        method = mogp
+    elif method == "ttgp":
+        method = ttgp
+    else:
+        print("UNKNOWN METHOD: MUST BE ONE OF (sgp, mogp, ttgp)")
+
+
     # Load red wine data
     path = Path.cwd() / '..' / 'data' / str(sys.argv[1] + '.csv')
     dataset = pd.read_csv(path.resolve(), sep=sys.argv[3])
@@ -42,7 +55,7 @@ if __name__ == "__main__":
         test_target = test[target].values
 
         # Perform Evolution using Seed
-        _best, _log = ttgp.evolve(train_data, train_target, dataset.columns.drop([target]), test_data, test_target)
+        _best, _log = method.evolve(train_data, train_target, dataset.columns.drop([target]), test_data, test_target)
         tts_log.append(_log)
         tts_best.append(_best)
         print("FINISHED EVOLUTION OF GENERATION: ", i)
@@ -59,6 +72,6 @@ if __name__ == "__main__":
     averaged = pd.DataFrame(d)  # This collects the average over the runs at each generation
     averaged = [{'gen': entry[0], 'best':entry[1][1]} for entry in averaged.iterrows()]
 
-    shared.draw_descent(averaged, measure='best', method="TTSGP", fname=sys.argv[1]+'-evo')
-    shared.draw_solution(tts_best[0], fname=sys.argv[1]+'-TTSGP-ex')  # TODO: Use the best overall solution, not a random
+    shared.draw_descent(averaged, measure='best', method=sys.argv[4], fname=sys.argv[1]+'-evo')
+    shared.draw_solution(tts_best[0], fname=sys.argv[1]+'-ex-'+sys.argv[4])  # TODO: Use the best overall solution, not a random
 
