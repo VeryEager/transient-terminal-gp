@@ -180,3 +180,17 @@ def getBalancedInd(pareto, pop):
     print(normalized_hof)   # TODO: normalization requires the pareto front be present in the population see Issue #18
     distances = [distance.euclidean(root, ind.fitness.values) for ind in pareto]
     return pareto[distances.index(np.min(distances))]
+
+
+def applyOps(population, toolbox, cxpb, mutpb):
+    """
+    Applies exclusive mutation, crossover, and transient mutation to a population. Based on deap.algorithms.varOr
+
+    :param population: population to dynamize
+    :param toolbox: toolbox reference
+    :param cxpb: crossover probability
+    :param mutpb: mutation probability
+    :return:
+    """
+    # TODO: implement this for TTSGP. For SGP/MOGP can just use deap.algorithms.varOr
+    return

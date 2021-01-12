@@ -6,7 +6,7 @@ Written by Asher Stout, 300432820
 from deap import base, creator, tools, gp
 from sklearn.metrics import mean_squared_error
 import operator as op
-import random as rand
+from deap.algorithms import varOr
 import numpy
 import shared
 
@@ -39,25 +39,22 @@ def create_definitions(tb, pset):
     :param pset: the primitive set
     :return:
     """
-    # Initialize individual, fitness, and population
+    # Initialize individual, fitness, population, etc
     creator.create("Fitness", base.Fitness, weights=(-1.0,))
     creator.create("Individual", gp.PrimitiveTree, fitness=creator.Fitness)
     tb.register("initialize", gp.genHalfAndHalf, pset=pset, min_=1, max_=4)
     tb.register("individual", tools.initIterate, container=creator.Individual, generator=tb.initialize)
     tb.register("population", tools.initRepeat, container=list, func=tb.individual)
-
-    # Register genetic operators & decorate bounds
-    tb.register("crossover", gp.cxOnePoint)
-    tb.decorate("crossover", gp.staticLimit(key=op.attrgetter('height'), max_value=90))
-    tb.register("expr_mut", gp.genFull, min_=1, max_=3)
-    tb.register("mutate", gp.mutUniform, expr=tb.expr_mut, pset=pset)
-    tb.decorate("mutate", gp.staticLimit(key=op.attrgetter('height'), max_value=90))
-
-    # Register selection, evaluation, compiliation
     tb.register("selection", tools.selTournament)
     tb.register("evaluation", rmse_evaluation, _tb=tb)
     tb.register("compile", gp.compile, pset=pset)
-    return
+
+    # Register genetic operators & decorate bounds
+    tb.register("mate", gp.cxOnePoint)
+    tb.register("expr_mut", gp.genFull, min_=1, max_=3)
+    tb.register("mutate", gp.mutUniform, expr=tb.expr_mut, pset=pset)
+    tb.decorate("mate", gp.staticLimit(key=op.attrgetter("height"), max_value=90))
+    tb.decorate("mutate", gp.staticLimit(key=op.attrgetter("height"), max_value=90))
 
 
 def evolve(data, labels, names, tdata, tlabels, generations=50, pop_size=100, cxpb=0.9, mutpb=0.1):
@@ -94,27 +91,15 @@ def evolve(data, labels, names, tdata, tlabels, generations=50, pop_size=100, cx
     # Begin evolution of population
     for g in range(1, generations):
         nextgen = toolbox.selection(pop, len(pop), tournsize=10)
-        nextgen = [toolbox.clone(ind) for ind in nextgen]
-
-        # Perform crossover
-        for child1, child2 in zip(nextgen[::2], nextgen[1::2]):
-            if rand.random() < cxpb:
-                toolbox.crossover(child1, child2)
-                del child1.fitness.values, child2.fitness.values
-
-        # Perform mutation
-        for ind in nextgen:
-            if rand.random() < mutpb:
-                toolbox.mutate(ind)
-                del ind.fitness.values
+        nextgen = varOr(nextgen, toolbox, len(nextgen), cxpb, mutpb)
 
         # Update fitness & population, update HoF, record generation log
         invalidind = [ind for ind in nextgen if not ind.fitness.valid]
         fitness = [toolbox.evaluation(function=ind, data=data, actual=labels) for ind in invalidind]
         for ind, fit in zip(invalidind, fitness):
             ind.fitness.values = fit
+        hof.update(nextgen)
+        pop[:] = nextgen
         logbook.record(gen=g, best=toolbox.evaluation(function=hof[0], data=tdata, actual=tlabels), bestsize=len(hof[0]), **stats.compile(pop))
         print(logbook.stream)
-        pop[:] = nextgen
-        hof.update(pop)
     return hof[0], logbook
