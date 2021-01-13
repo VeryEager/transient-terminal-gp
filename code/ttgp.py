@@ -29,8 +29,8 @@ def create_definitions(tb, pset):
     tb.register("population", tools.initRepeat, container=list, func=tb.individual)
 
     # Register genetic operators & decorate bounds
-    tb.register("crossover", gp.cxOnePoint)
-    tb.decorate("crossover", gp.staticLimit(key=op.attrgetter('height'), max_value=90))
+    tb.register("mate", gp.cxOnePoint)
+    tb.decorate("mate", gp.staticLimit(key=op.attrgetter('height'), max_value=90))
     tb.register("expr_mut", gp.genFull, min_=1, max_=3)
     tb.register("mutate", gp.mutUniform, expr=tb.expr_mut, pset=pset)
     tb.decorate("mutate", gp.staticLimit(key=op.attrgetter('height'), max_value=90))
@@ -81,27 +81,7 @@ def evolve(data, labels, names, tdata, tlabels, generations=50, pop_size=100, cx
     # Begin evolution of population
     for g in range(1, generations):
         nextgen = toolbox.selection(pop, len(pop))
-        nextgen = [toolbox.clone(ind) for ind in nextgen]
-        for ind in nextgen:
-            ind = ind.update_last()  # Update the metadata on evolution
-
-        # Perform crossover
-        for child1, child2 in zip(nextgen[::2], nextgen[1::2]):
-            if rand.random() < cxpb:
-                toolbox.crossover(child1, child2)
-                del child1.fitness.values, child2.fitness.values
-
-        # Perform mutation
-        for ind in nextgen:
-            if rand.random() < mutpb:
-                toolbox.mutate(ind)
-                del ind.fitness.values
-
-        # Perform transient mutation
-        for ind in nextgen:
-            if (rand.random() < tmutpb) and (transient.trans_count >= 1):
-                toolbox.transient_mutate(ind)
-                del ind.fitness.values
+        nextgen = shared.applyOps(nextgen, toolbox, cxpb, mutpb, tmutpb, (transient.trans_count > 0))
 
         # Update fitness & population, update HoF, record generation log
         invalidind = [ind for ind in nextgen if not ind.fitness.valid]

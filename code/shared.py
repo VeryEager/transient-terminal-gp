@@ -182,15 +182,35 @@ def getBalancedInd(pareto, pop):
     return pareto[distances.index(np.min(distances))]
 
 
-def applyOps(population, toolbox, cxpb, mutpb):
+def applyOps(population, toolbox, cxpb, mutpb, tmutpb, tmut=False):
     """
-    Applies exclusive mutation, crossover, and transient mutation to a population. Based on deap.algorithms.varOr
+    Applies exclusive mutation, crossover, and transient mutation to a population. Adapted from deap.algorithms.varOr
 
     :param population: population to dynamize
     :param toolbox: toolbox reference
     :param cxpb: crossover probability
     :param mutpb: mutation probability
+    :param tmutpb: transient mutation probability
+    :param tmut: Is transient mutation allowed? Should be disallowed when len(TTS) = 0
     :return:
     """
-    # TODO: implement this for TTSGP. For SGP/MOGP can just use deap.algorithms.varOr
-    return
+    offspring = []
+    for _ in range(len(population)):
+        op_choice = rand.random()
+        if op_choice < cxpb:  # Apply crossover
+            ind1, ind2 = map(toolbox.clone, rand.sample(population, 2))
+            ind1, ind2 = toolbox.mate(ind1, ind2)
+            del ind1.fitness.values
+            offspring.append(ind1)
+        elif op_choice < cxpb + mutpb:  # Apply mutation
+            ind = toolbox.clone(rand.choice(population))
+            ind, = toolbox.mutate(ind)
+            del ind.fitness.values
+            offspring.append(ind)
+        elif op_choice < cxpb+mutpb+tmutpb and tmut:  # Apply transient mutation
+            ind = toolbox.clone(rand.choice(population))
+            ind, = toolbox.transient_mutate(ind)
+            del ind.fitness.values
+            offspring.append(ind)
+
+    return offspring
