@@ -168,17 +168,18 @@ def init_logger(*names):
 
 def getBalancedInd(pareto, pop):
     """
-    Retrieves the most balanced individual from a front.
+    Retrieves the most balanced individual from a Pareto front.
 
-    :param pareto: The pareto front to pull the individual from
+    :param pareto: The Pareto front to pull the individual from
     :param pop: Population to normalize fitness values over
     :return: the individual
     """
     root = (0, 0)  # the conceivably 'best' solution
     normalized_pop = pre.normalize([ind.fitness.values for ind in pop])
     normalized_hof = [normalized_pop[pop.index(ind)] for ind in pareto]
-    print(normalized_hof)   # TODO: normalization requires the pareto front be present in the population see Issue #18
-    distances = [distance.euclidean(root, ind.fitness.values) for ind in pareto]
+    # TODO: normalization requires the pareto front be present in the population see Issue #18
+    distances = [distance.euclidean(root, ind) for ind in normalized_hof]
+    print(distances)
     return pareto[distances.index(np.min(distances))]
 
 
@@ -202,12 +203,12 @@ def applyOps(population, toolbox, cxpb, mutpb, tmutpb, tmut=False):
             ind1, ind2 = toolbox.mate(ind1, ind2)
             del ind1.fitness.values
             offspring.append(ind1)
-        elif op_choice < cxpb + mutpb:  # Apply mutation
+        elif op_choice < cxpb + mutpb or not tmut:  # Apply mutation normally, OR when transient mutation isnt available
             ind = toolbox.clone(rand.choice(population))
             ind, = toolbox.mutate(ind)
             del ind.fitness.values
             offspring.append(ind)
-        elif op_choice < cxpb+mutpb+tmutpb and tmut:  # Apply transient mutation
+        elif op_choice < cxpb+mutpb+tmutpb:  # Apply transient mutation
             ind = toolbox.clone(rand.choice(population))
             ind, = toolbox.transient_mutate(ind)
             del ind.fitness.values

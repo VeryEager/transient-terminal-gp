@@ -81,7 +81,12 @@ def evolve(data, labels, names, tdata, tlabels, generations=50, pop_size=100, cx
     # Begin evolution of population
     for g in range(1, generations):
         nextgen = toolbox.selection(pop, len(pop))
+        for ind in nextgen:
+            ind = ind.update_last()  # Update the metadata on evolution prior to this generation's evolution
+        elites = nextgen[0:int(pop_size*0.1)]   # Elites comprise the best 10% of the population
+        del nextgen[0:int(pop_size*0.1)]
         nextgen = shared.applyOps(nextgen, toolbox, cxpb, mutpb, tmutpb, (transient.trans_count > 0))
+        nextgen = nextgen + elites  # After generation evolution add elites back into population
 
         # Update fitness & population, update HoF, record generation log
         invalidind = [ind for ind in nextgen if not ind.fitness.valid]
