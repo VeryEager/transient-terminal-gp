@@ -3,10 +3,10 @@ Contains code for single-objectove GP algorithm using DEAP.
 
 Written by Asher Stout, 300432820
 """
+from deap.algorithms import varOr
 from deap import base, creator, tools, gp
 from sklearn.metrics import mean_squared_error
 import operator as op
-from deap.algorithms import varOr
 import numpy
 import shared
 
@@ -76,7 +76,7 @@ def evolve(data, labels, names, tdata, tlabels, generations=50, pop_size=100, cx
     toolbox = base.Toolbox()
     primitives = shared.create_primitives(names, data.shape[1])
     create_definitions(toolbox, primitives)
-    stats, logbook = shared.init_logger("gen", "best", "bestsize")
+    stats, logbook = shared.init_logger("gen", "best")
     pop = toolbox.population(n=pop_size)
     hof = tools.ParetoFront()
 
@@ -85,7 +85,7 @@ def evolve(data, labels, names, tdata, tlabels, generations=50, pop_size=100, cx
     for ind, fit in zip([ind for ind in pop if not ind.fitness.valid], fitness):
         ind.fitness.values = fit
     hof.update(pop)
-    logbook.record(gen=0, best=toolbox.evaluation(function=hof[0], data=tdata, actual=tlabels), bestsize=len(hof[0]), **stats.compile(pop))
+    logbook.record(gen=0, best=tuple(list(toolbox.evaluation(function=hof[0], data=tdata, actual=tlabels))+[len(hof[0])]), **stats.compile(pop))
     print(logbook.stream)
 
     # Begin evolution of population
@@ -100,6 +100,6 @@ def evolve(data, labels, names, tdata, tlabels, generations=50, pop_size=100, cx
             ind.fitness.values = fit
         hof.update(nextgen)
         pop[:] = nextgen
-        logbook.record(gen=g, best=toolbox.evaluation(function=hof[0], data=tdata, actual=tlabels), bestsize=len(hof[0]), **stats.compile(pop))
+        logbook.record(gen=g, best=tuple(list(toolbox.evaluation(function=hof[0], data=tdata, actual=tlabels))+[len(hof[0])]), **stats.compile(pop))
         print(logbook.stream)
     return hof[0], logbook

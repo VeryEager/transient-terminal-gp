@@ -4,8 +4,8 @@ Contains code for the standard GP algorithm using DEAP.
 Written by Asher Stout, 300432820
 """
 from deap import base, creator, tools, gp
+from deap.algorithms import varOr
 import operator as op
-import random as rand
 import shared
 
 
@@ -72,28 +72,16 @@ def evolve(data, labels, names, tdata, tlabels, generations=50, pop_size=100, cx
     # Begin evolution of population
     for g in range(1, generations):
         nextgen = toolbox.selection(pop, len(pop))
-        nextgen = [toolbox.clone(ind) for ind in nextgen]
-
-        # Perform crossover
-        for child1, child2 in zip(nextgen[::2], nextgen[1::2]):
-            if rand.random() < cxpb:
-                toolbox.crossover(child1, child2)
-                del child1.fitness.values, child2.fitness.values
-
-        # Perform mutation
-        for ind in nextgen:
-            if rand.random() < mutpb:
-                toolbox.mutate(ind)
-                del ind.fitness.values
+        nextgen = varOr(nextgen, toolbox, len(nextgen), cxpb, mutpb)
 
         # Update fitness & population, update HoF, record generation log
         invalidind = [ind for ind in nextgen if not ind.fitness.valid]
         fitness = [toolbox.evaluation(function=ind, data=data, actual=labels) for ind in invalidind]
         for ind, fit in zip(invalidind, fitness):
             ind.fitness.values = fit
+        hof.update(pop)
+        pop[:] = nextgen
         logbook.record(gen=g, best=toolbox.evaluation(function=hof[0], data=tdata, actual=tlabels),
                        **stats.compile(pop))
         print(logbook.stream)
-        pop[:] = nextgen
-        hof.update(pop)
     return hof[0], logbook

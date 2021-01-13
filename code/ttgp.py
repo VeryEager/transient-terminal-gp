@@ -108,8 +108,8 @@ def evolve(data, labels, names, tdata, tlabels, generations=50, pop_size=100, cx
         fitness = [toolbox.evaluation(function=ind, data=data, actual=labels) for ind in invalidind]
         for ind, fit in zip(invalidind, fitness):
             ind.fitness.values = fit
-        pop[:] = nextgen
         hof.update(pop)
+        pop[:] = nextgen
         logbook.record(gen=g, best=toolbox.evaluation(function=shared.getBalancedInd(hof, pop), data=tdata, actual=tlabels),
                        **stats.compile(pop))
         print(logbook.stream)
