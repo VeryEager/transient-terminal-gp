@@ -166,21 +166,17 @@ def init_logger(*names):
     return stats, log
 
 
-def getBalancedInd(pareto, pop):
+def getBalancedInd(pareto):
     """
     Retrieves the most balanced individual from a Pareto front.
 
     :param pareto: The Pareto front to pull the individual from
-    :param pop: Population to normalize fitness values over
     :return: the individual
     """
-    root = (0, 0)  # the conceivably 'best' solution
-    normalized_pop = pre.normalize([ind.fitness.values for ind in pop])
-    normalized_hof = [normalized_pop[pop.index(ind)] for ind in pareto]
-    # TODO: normalization requires the pareto front be present in the population see Issue #18
-    distances = [distance.euclidean(root, ind) for ind in normalized_hof]
-    print(distances)
-    return pareto[distances.index(np.min(distances))]
+    root = (0, 0)
+    normal_hof = list(pre.normalize([ind.fitness.values for ind in pareto]))
+    distances = [distance.euclidean(root, ind) for ind in normal_hof]
+    return pareto[distances.index(np.min(distances))]   # TODO: implement the technique described in issue #14
 
 
 def applyOps(population, toolbox, cxpb, mutpb, tmutpb, tmut=False):
