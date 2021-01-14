@@ -22,7 +22,7 @@ seeds = [39256911, 933855996, 967670959, 968137054, 590138938, 297331027, 755510
          87347336, 80635188, 661477758, 785773283, 950108759, 223073113, 309659173, 670766008, 370663937, 77914081,
          74406820, 94203230, 510105635, 717950752, 895387929, 865939420, 696230280, 695258916, 241343355, 720042387,
          232736156, 424335977, 353975857, 517983807, 674857291, 139546984, 446846029, 69735089, 876193725, 323506402]
-
+balance_curve = np.arange(0, 1.0, 0.01)  # Used as a ref for 'balanced' solutions when selecting which is the best
 
 def protected_division(x, y):
     """
@@ -175,8 +175,11 @@ def getBalancedInd(pareto):
     """
     root = (0, 0)
     normal_hof = list(pre.normalize([ind.fitness.values for ind in pareto]))
-    distances = [distance.euclidean(root, ind) for ind in normal_hof]
-    return pareto[distances.index(np.min(distances))]   # TODO: implement the technique described in issue #14
+    print([i.fitness.values for i in pareto])
+    distances = [distance.euclidean(root, ind) +
+                 np.min([distance.euclidean(ind, [p, p]) for p in balance_curve]) for ind in normal_hof]
+    print(distances)
+    return pareto[distances.index(np.min(distances))]
 
 
 def applyOps(population, toolbox, cxpb, mutpb, tmutpb, tmut=False):
