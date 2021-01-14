@@ -97,8 +97,8 @@ class TransientSet(PrimitiveSet):
                 self.removeOldestSubtree()
 
         # Calculate mean change in fitness measures
-        acc_threshold = mean([ind.former.fitness.values[0]-ind.fitness.values[0] for ind in population])
-        com_threshold = mean([ind.former.fitness.values[1]-ind.fitness.values[1] for ind in population])
+        acc_threshold = percentile([ind.former.fitness.values[0]-ind.fitness.values[0] for ind in population], q=90)
+        com_threshold = percentile([ind.former.fitness.values[1]-ind.fitness.values[1] for ind in population], q=90)
 
         for ind in population:
             acc = ind.former.fitness.values[0]-ind.fitness.values[0]
