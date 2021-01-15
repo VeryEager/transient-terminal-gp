@@ -13,6 +13,15 @@ import ttsfunctions as ttsf
 transient = tts.TransientSet(name="transient", arity=1, lifespan=5)
 
 
+def __set_transient_threshold(thresh):
+    """
+    Sets the transient threshold for the instance's TTS
+    :param thresh: the new threshold for adding a subtree to the TTS
+
+    """
+    transient.thresh = thresh
+
+
 def create_definitions(tb, pset):
     """
     Initializes a variety of parameters using the DEAP creator & toolbox

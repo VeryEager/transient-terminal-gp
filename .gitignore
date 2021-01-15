@@ -131,3 +131,4 @@ dmypy.json
 
 # Project dependent excludes
 code/.idea
+code/interpreter

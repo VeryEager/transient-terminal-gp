@@ -114,8 +114,6 @@ if __name__ == "__main__":
             tts_log.append(_log)
             tts_best.append(_best)
             print("FINISHED EVOLUTION OF POPULATION: ", i)
-            if i == 9:
-                break
         time_logs.append(time.time()-start_time)
 
         # Average the results & report descent & best individual.

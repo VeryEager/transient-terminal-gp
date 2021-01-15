@@ -72,12 +72,13 @@ class TransientSet(PrimitiveSet):
     contains subtrees pulled from the population and are subsequently used during mutation.
     """
 
-    def __init__(self, name, arity, lifespan):
+    def __init__(self, name, arity, lifespan=5, thresh=90):
         PrimitiveSet.__init__(self, name, arity)
-        self.transient = []
         self.trans_count = 0
-        self.lifespan = lifespan
+        self.transient = []
         self.entry_life = []
+        self.lifespan = lifespan
+        self.thresh = thresh
 
     def update_set(self, population, generation):
         """
@@ -97,8 +98,8 @@ class TransientSet(PrimitiveSet):
                 self.removeOldestSubtree()
 
         # Calculate mean change in fitness measures
-        acc_threshold = percentile([ind.former.fitness.values[0]-ind.fitness.values[0] for ind in population], q=90)
-        com_threshold = percentile([ind.former.fitness.values[1]-ind.fitness.values[1] for ind in population], q=90)
+        acc_threshold = percentile([ind.former.fitness.values[0]-ind.fitness.values[0] for ind in population], q=self.thresh)
+        com_threshold = percentile([ind.former.fitness.values[1]-ind.fitness.values[1] for ind in population], q=self.thresh)
 
         for ind in population:
             acc = ind.former.fitness.values[0]-ind.fitness.values[0]
