@@ -3,9 +3,10 @@ This file contains classes and functions requried for the implementation of Tran
 
 Written by Asher Stout, 300432820
 """
-
+from ttsfunctions import _percent_improve
 from deap.gp import PrimitiveTree, PrimitiveSet
-from numpy import percentile
+from numpy import percentile, abs
+from scipy import stats
 
 
 class TransientTree(PrimitiveTree):
@@ -96,15 +97,21 @@ class TransientSet(PrimitiveSet):
                 self.entry_life.pop()
                 self.removeOldestSubtree()
 
-        # Calculate change in fitness measures at the Nth percentile
-        fitness_count = len(population[0].fitness.values)   # How many objectives do we have?
-        change_thresholds = [percentile([ind.former.fitness.values[i]-ind.fitness.values[i] for ind in
-                                         population], q=self.thresh) for i in range(0, fitness_count)]
+        fitness_count = range(0, len(population[0].fitness.values))   # How many objectives do we have?
+
+        # Calculate the % improvement in the population, and remove all which are not Pareto improvements
+        relative_improvements = [[_percent_improve(ind, i) for ind in population] for i in fitness_count]
+        relative_improvements = [ind for i, ind in enumerate(population) if all([relative_improvements[n][i] <= 0 for n
+                                                                                 in fitness_count])]
+        # Then calculate the Nth percentile improvement using the % improvement
+        relative_improvements = [[abs(_percent_improve(ind, i)) for ind in relative_improvements] for i in
+                                 fitness_count]  # needs to be abs() so percentiles correctly work
+        change_thresholds = [percentile(relative_improvements[i], q=self.thresh) for i in fitness_count]
 
         for ind in population:
-            changes = [ind.former.fitness.values[i]-ind.fitness.values[i] for i in range(0, fitness_count)]
+            changes = [_percent_improve(ind, i) for i in fitness_count]
             # If the change in fitness is valid and the subtree is not already in the TTS, then include it
-            if all([(changes[i] > 0) & (changes[i] > change_thresholds[i]) for i in range(0, fitness_count)]):
+            if all([(changes[i] < 0 and abs(changes[i]) >= change_thresholds[i]) for i in fitness_count]):
                 diff = ind.difference()
                 subtree = TransientSubtree(diff, str(diff))
                 if not self.context.keys().__contains__(subtree.name):

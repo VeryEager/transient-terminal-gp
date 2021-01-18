@@ -38,3 +38,13 @@ def genRand(pset, type_=None):
     subtree = random.choice(pset.transient)
     return subtree
 
+
+def _percent_improve(ind, index=0):
+    """
+    Calculates the % improvement in a solution's fitness acc. to the formula (b-a)/a
+
+    :param ind: the solution
+    :param index: the index of the fitness calculated. 0 in the case of single-fitness
+    :return: the % improvement in results
+    """
+    return (ind.fitness.values[index]-ind.former.fitness.values[index])/ind.former.fitness.values[index]
