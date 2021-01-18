@@ -4,8 +4,8 @@ This file contains classes and functions requried for the implementation of Tran
 Written by Asher Stout, 300432820
 """
 
-from deap.gp import PrimitiveTree, PrimitiveSet, Terminal, Primitive
-from numpy import mean, percentile
+from deap.gp import PrimitiveTree, PrimitiveSet
+from numpy import percentile
 
 
 class TransientTree(PrimitiveTree):
@@ -88,7 +88,6 @@ class TransientSet(PrimitiveSet):
         :param generation: the current generation
         :return:
         """
-        ntran = self
 
         # Remove deprecated subtrees
         self.entry_life = [life-1 for life in self.entry_life]
@@ -97,20 +96,20 @@ class TransientSet(PrimitiveSet):
                 self.entry_life.pop()
                 self.removeOldestSubtree()
 
-        # Calculate mean change in fitness measures
-        acc_threshold = percentile([ind.former.fitness.values[0]-ind.fitness.values[0] for ind in population], q=self.thresh)
-        com_threshold = percentile([ind.former.fitness.values[1]-ind.fitness.values[1] for ind in population], q=self.thresh)
+        # Calculate change in fitness measures at the Nth percentile
+        fitness_count = len(population[0].fitness.values)   # How many objectives do we have?
+        change_thresholds = [percentile([ind.former.fitness.values[i]-ind.fitness.values[i] for ind in
+                                         population], q=self.thresh) for i in range(0, fitness_count)]
 
         for ind in population:
-            acc = ind.former.fitness.values[0]-ind.fitness.values[0]
-            com = ind.former.fitness.values[1]-ind.fitness.values[1]  # Add subtree if it improves enough
-            if (acc > 0) & (acc > acc_threshold) & (com > 0) & (com > com_threshold):
+            changes = [ind.former.fitness.values[i]-ind.fitness.values[i] for i in range(0, fitness_count)]
+            # If the change in fitness is valid and the subtree is not already in the TTS, then include it
+            if all([(changes[i] > 0) & (changes[i] > change_thresholds[i]) for i in range(0, fitness_count)]):
                 diff = ind.difference()
                 subtree = TransientSubtree(diff, str(diff))
                 if not self.context.keys().__contains__(subtree.name):
                     self.addSubtree(subtree)
                     self.entry_life.append(generation)
-        return ntran
 
     def addSubtree(self, subtree):
         """

@@ -1,5 +1,5 @@
 """
-Contains code for the standard GP algorithm using DEAP.
+Contains code for the MOGP algorithm using DEAP.
 
 Written by Asher Stout, 300432820
 """
