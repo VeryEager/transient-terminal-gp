@@ -5,7 +5,6 @@ Written by Asher Stout, 300432820
 """
 from deap import base, creator, tools, gp
 import operator as op
-import random as rand
 import shared
 import ttsclasses as tts
 import ttsfunctions as ttsf

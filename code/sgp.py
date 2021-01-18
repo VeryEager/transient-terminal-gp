@@ -1,5 +1,5 @@
 """
-Contains code for single-objectove GP algorithm using DEAP.
+Contains code for single-objective GP algorithm using DEAP and TTS.
 
 Written by Asher Stout, 300432820
 """
@@ -7,8 +7,12 @@ from deap.algorithms import varOr
 from deap import base, creator, tools, gp
 from sklearn.metrics import mean_squared_error
 import operator as op
+import ttsclasses as tts
+import ttsfunctions as ttsf
 import numpy
 import shared
+
+transient = tts.TransientSet(name="transient", arity=1, lifespan=5)
 
 
 def rmse_evaluation(function, data, actual, _tb):
@@ -55,9 +59,12 @@ def create_definitions(tb, pset):
     tb.register("mutate", gp.mutUniform, expr=tb.expr_mut, pset=pset)
     tb.decorate("mate", gp.staticLimit(key=op.attrgetter("height"), max_value=90))
     tb.decorate("mutate", gp.staticLimit(key=op.attrgetter("height"), max_value=90))
+    tb.register("expr_trans_mut", ttsf.genRand)
+    tb.register("transient_mutate", ttsf.transientMutUniform, expr=tb.expr_trans_mut, pset=transient)
+    tb.decorate("transient_mutate", gp.staticLimit(key=op.attrgetter('height'), max_value=90))
 
 
-def evolve(data, labels, names, tdata, tlabels, generations=50, pop_size=100, cxpb=0.9, mutpb=0.1):
+def evolve(data, labels, names, tdata, tlabels, generations=50, pop_size=100, cxpb=0.9, mutpb=0.1, tmutpb=0.1):
     """
     Performs the setup for the main evolutionary process
     :param data: training data to use during evolution
@@ -69,6 +76,7 @@ def evolve(data, labels, names, tdata, tlabels, generations=50, pop_size=100, cx
     :param pop_size: population size
     :param cxpb: crossover probability
     :param mutpb: mutation probability
+    :param tmutpb: transient mutation probability
 
     :return: the best individual of the evolution & the log
     """
@@ -91,7 +99,7 @@ def evolve(data, labels, names, tdata, tlabels, generations=50, pop_size=100, cx
     # Begin evolution of population
     for g in range(1, generations):
         nextgen = toolbox.selection(pop, len(pop), tournsize=10)
-        nextgen = varOr(nextgen, toolbox, len(nextgen), cxpb, mutpb)
+        nextgen = shared.applyOps(nextgen, toolbox, cxpb, mutpb, tmutpb, (transient.trans_count > 0))
 
         # Update fitness & population, update HoF, record generation log
         invalidind = [ind for ind in nextgen if not ind.fitness.valid]
