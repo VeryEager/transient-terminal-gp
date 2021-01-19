@@ -45,7 +45,7 @@ def create_definitions(tb, pset):
     """
     # Initialize individual, fitness, population, etc
     creator.create("Fitness", base.Fitness, weights=(-1.0,))
-    creator.create("Individual", gp.PrimitiveTree, fitness=creator.Fitness)
+    creator.create("Individual", tts.TransientTree, fitness=creator.Fitness)
     tb.register("initialize", gp.genHalfAndHalf, pset=pset, min_=1, max_=4)
     tb.register("individual", tools.initIterate, container=creator.Individual, generator=tb.initialize)
     tb.register("population", tools.initRepeat, container=list, func=tb.individual)
@@ -98,7 +98,10 @@ def evolve(data, labels, names, tdata, tlabels, generations=50, pop_size=100, cx
 
     # Begin evolution of population
     for g in range(1, generations):
+        for ind in pop:
+            ind.update_last()  # Update the metadata on evolution prior to this generation's evolution
         nextgen = toolbox.selection(pop, len(pop), tournsize=10)
+        nextgen = [toolbox.clone(ind) for ind in nextgen]
         nextgen = shared.applyOps(nextgen, toolbox, cxpb, mutpb, tmutpb, (transient.trans_count > 0))
 
         # Update fitness & population, update HoF, record generation log
@@ -106,8 +109,11 @@ def evolve(data, labels, names, tdata, tlabels, generations=50, pop_size=100, cx
         fitness = [toolbox.evaluation(function=ind, data=data, actual=labels) for ind in invalidind]
         for ind, fit in zip(invalidind, fitness):
             ind.fitness.values = fit
-        hof.update(nextgen)
         pop[:] = nextgen
+        hof.update(nextgen)
         logbook.record(gen=g, best=tuple(list(toolbox.evaluation(function=hof[0], data=tdata, actual=tlabels))+[len(hof[0])]), **stats.compile(pop))
         print(logbook.stream)
+
+        # Update Transient Terminal Set for next generation
+        transient.update_set(pop, g)
     return hof[0], logbook
