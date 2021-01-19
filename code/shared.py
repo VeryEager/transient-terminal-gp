@@ -194,23 +194,16 @@ def applyOps(population, toolbox, cxpb, mutpb, tmutpb, tmut=False):
     :param tmut: Is transient mutation allowed? Should be disallowed when len(TTS) = 0
     :return:
     """
-    offspring = []
-    for _ in range(len(population)):
+    # Individuals are evolved pairwise
+    for ind1, ind2 in zip(population[::2], population[1::2]):
         op_choice = rand.random()
         if op_choice < cxpb:  # Apply crossover
-            ind1, ind2 = map(toolbox.clone, rand.sample(population, 2))
             ind1, ind2 = toolbox.mate(ind1, ind2)
-            del ind1.fitness.values
-            offspring.append(ind1)
-        elif op_choice < cxpb + mutpb or not tmut:  # Apply mutation normally, OR when transient mutation isnt available
-            ind = toolbox.clone(rand.choice(population))
-            ind, = toolbox.mutate(ind)
-            del ind.fitness.values
-            offspring.append(ind)
+        elif op_choice < cxpb+mutpb or not tmut:  # Apply mutation, OR when transient mutation isn't available
+            toolbox.mutate(ind1)
+            toolbox.mutate(ind2)
         elif op_choice < cxpb+mutpb+tmutpb:  # Apply transient mutation
-            ind = toolbox.clone(rand.choice(population))
-            ind, = toolbox.transient_mutate(ind)
-            del ind.fitness.values
-            offspring.append(ind)
-
-    return offspring
+            toolbox.transient_mutate(ind1)
+            toolbox.transient_mutate(ind2)
+        del ind1.fitness.values, ind2.fitness.values
+    return population

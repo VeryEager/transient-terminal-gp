@@ -74,6 +74,7 @@ def evolve(data, labels, names, tdata, tlabels, generations=50, pop_size=100, cx
     primitives = shared.create_primitives(names, data.shape[1])
     create_definitions(toolbox, primitives)
     pop = toolbox.population(n=pop_size)
+    pop = toolbox.selection(pop, len(pop))  # Assigns crowding dist to initial pop
     hof = tools.ParetoFront()
     stats, logbook = shared.init_logger("gen", "best")
 
@@ -88,21 +89,19 @@ def evolve(data, labels, names, tdata, tlabels, generations=50, pop_size=100, cx
 
     # Begin evolution of population
     for g in range(1, generations):
-        nextgen = toolbox.selection(pop, len(pop))
-        for ind in nextgen:
-            ind = ind.update_last()  # Update the metadata on evolution prior to this generation's evolution
-        elites = nextgen[0:int(pop_size*0.1)]   # Elites comprise the best 10% of the population
-        del nextgen[0:int(pop_size*0.1)]
+        for ind in pop:
+            ind.update_last()  # Update the metadata on evolution prior to this generation's evolution
+        nextgen = tools.selTournamentDCD(pop, len(pop))
+        nextgen = [toolbox.clone(ind) for ind in nextgen]
         nextgen = shared.applyOps(nextgen, toolbox, cxpb, mutpb, tmutpb, (transient.trans_count > 0))
-        nextgen = nextgen + elites  # After generation evolution add elites back into population
 
         # Update fitness & population, update HoF, record generation log
         invalidind = [ind for ind in nextgen if not ind.fitness.valid]
         fitness = [toolbox.evaluation(function=ind, data=data, actual=labels) for ind in invalidind]
         for ind, fit in zip(invalidind, fitness):
             ind.fitness.values = fit
+        pop = toolbox.selection(pop+nextgen, pop_size)
         hof.update(pop)
-        pop[:] = nextgen
         logbook.record(gen=g, best=toolbox.evaluation(function=hof[0], data=tdata, actual=tlabels),
                        **stats.compile(pop))
         print(logbook.stream)
