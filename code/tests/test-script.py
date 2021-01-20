@@ -22,6 +22,7 @@ if __name__ == "__main__":
     arg2: name of the dataset's target variable 
     arg3: separator character (usually ';' or ',' - CHECK DATASET PRIOR
     arg4: string representing the method used. ONE OF: (sgp, mogp, ttsgp)
+    arg5: string which individual to plot. ONE OF: (best, balanced)
     
     """
     # Configure evolutionary method from command-line argument
@@ -62,15 +63,16 @@ if __name__ == "__main__":
     # Average the results & report descent & best individual.
     # TODO: There should be a cleaner way to achieve this.
     averaged = []
+    _type = sys.argv[5]
     for log in tts_log:
-        averaged.append([ind['best'] for ind in log])
+        averaged.append([ind[_type] for ind in log])
     averaged = pd.DataFrame(averaged)
     acc = [np.mean([entry[0] for entry in averaged[col]]) for col in averaged]
     com = [np.mean([entry[1] for entry in averaged[col]]) for col in averaged]
-    d = {'gen': [entry['gen'] for entry in tts_log[0]], 'best': zip(acc, com)}
+    d = {'gen': [entry['gen'] for entry in tts_log[0]], _type: zip(acc, com)}
     averaged = pd.DataFrame(d)  # This collects the average over the runs at each generation
-    averaged = [{'gen': entry[0], 'best':entry[1][1]} for entry in averaged.iterrows()]
+    averaged = [{'gen': entry[0], _type:entry[1][1]} for entry in averaged.iterrows()]
 
-    shared.draw_descent(averaged, measure='best', method=sys.argv[4], fname=sys.argv[1]+'-evo')
+    shared.draw_descent(averaged, measure=_type, method=sys.argv[4], fname=sys.argv[1]+'-evo-'+_type)
     shared.draw_solution(tts_best[0], fname=sys.argv[1]+'-ex-'+sys.argv[4])  # TODO: Use the best overall solution, not a random
 

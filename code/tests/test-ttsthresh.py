@@ -15,7 +15,52 @@ import sklearn.model_selection as skms
 import matplotlib.pyplot as plot
 from pathlib import Path    # supports inter-OS relative path
 
-colors = ['#1a2a6c', '#4d2652', '#73243f', '#a52025', '#c54622', '#de7a27']
+colors = ['#1a2a6c', '#272966', '#33285f', '#402759', '#4d2652', '#59254c', '#662545', '#73243f', '#7f2339', '#8c2232',
+          '#99212c', '#a52025', '#b21f1f', '#b82c20', '#c54622', '#cb5324', '#d16025', '#d76d26', '#de7a27']
+_range = np.arange(5, 105, 5.0)
+
+
+def draw_threshold_descents(logs, measure, method, metric, show=False, fname='descent'):
+    """
+    Plots the change in accuracy/complexity in solutions over multiple transient mutation probabilities
+
+    :param logs: a list of each run's average
+    :param measure: the measure to plot from the logbook
+    :param method: method used, in string format
+    :param metric: the metric to be graphed, ONE OF: (complexity, accuracy)
+    :param show: whether to display the figure after saving
+    :param fname: file name of the figure
+    :return:
+    """
+    fit = 0
+    if metric == "complexity":
+        fit = 0
+    else:
+        fit = 1
+
+    # Create plot, add titles & initialize the axes
+    fig, ax1 = plot.subplots(figsize=(10, 6))
+    fig.suptitle(metric+" of best TTSGP solutions (50 runs): percentile="+_range)
+    fig.tight_layout()
+    ax1.set_xlabel('generation')
+    ax1.set_ylabel(metric)
+    ax1.tick_params(axis='y')
+
+    # Draw all y axis COMPLEXITY
+    for mut, color, prob in zip(logs, colors, _range):
+        xax = list(log['gen'] for log in mut)
+        ax1.plot(xax, list(log[measure][fit] for log in mut), color=color, alpha=0.6, label=str("percentile = " +
+                                                                                              str(round(prob, 2))))
+
+    ax1.legend(loc='center left', bbox_to_anchor=(0.0, 0.85), shadow=False, ncol=1)
+    fig.tight_layout()
+
+    # Save the figure & display the plot
+    path = Path.cwd() / '..' / 'docs' / 'Parameter-tests' / str(fname + '-' + method)
+    plot.savefig(fname=path)
+    if show:
+        plot.show()
+    plot.clf()
 
 
 if __name__ == "__main__":
@@ -33,7 +78,7 @@ if __name__ == "__main__":
 
     prob_logs = []
     time_logs = []
-    for thresh in np.arange(75, 105, 5.0):
+    for thresh in _range:
         tts_log = []
         tts_best = []
         # Perform experiments over seeds
@@ -53,6 +98,7 @@ if __name__ == "__main__":
             tts_log.append(_log)
             tts_best.append(_best)
             print("FINISHED EVOLUTION OF POPULATION: ", i)
+            break
 
         # Average the results & report descent & best individual.
         # TODO: There should be a cleaner way to achieve this.
@@ -68,3 +114,5 @@ if __name__ == "__main__":
         print("FINISHED EVALUATION OF thresh: ", thresh)
         prob_logs.append(averaged)
     # Here need to reference the drawing of both complexity & accuracy measures
+    draw_threshold_descents(prob_logs, measure='best', method='TTSGP', metric='complexity', fname='thresholddescent')
+    draw_threshold_descents(prob_logs, measure='best', method='TTSGP', metric='accuracy', fname='thresholddescent')

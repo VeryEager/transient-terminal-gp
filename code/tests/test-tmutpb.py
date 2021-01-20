@@ -16,39 +16,46 @@ import sklearn.model_selection as skms
 import matplotlib.pyplot as plot
 from pathlib import Path    # supports inter-OS relative path
 
-colors = ['#1a2a6c', '#4d2652', '#73243f', '#a52025', '#c54622', '#de7a27']
+colors = ['#1a2a6c', '#272966', '#33285f', '#402759', '#4d2652', '#662545', '#73243f', '#7f2339', '#8c2232', '#99212c',
+          '#a52025', '#b21f1f', '#b82c20', '#be3921', '#cb5324', '#d16025', '#d76d26', '#de7a27']
+_range = np.arange(0.0, 0.95, 0.05)
 
 
-def draw_mutation_descents(logs, measure, method, show=False, fname='descent'):
+def draw_mutation_descents(logs, measure, method, metric, show=False, fname='descent'):
     """
     Plots the change in accuracy/complexity in solutions over multiple transient mutation probabilities
 
     :param logs: a list of each run's average
     :param measure: the measure to plot from the logbook
     :param method: method used, in string format
+    :param metric: the metric to be graphed, ONE OF: (complexity, accuracy)
     :param show: whether to display the figure after saving
     :param fname: file name of the figure
     :return:
     """
+    fit = 0
+    if metric == "complexity":
+        fit = 0
+    else:
+        fit = 1
+
     # Create plot, add titles & initialize the axes
     fig, ax1 = plot.subplots(figsize=(10, 6))
-    fig.suptitle("Complexity of best TTSGP solutions (50 runs): tmutpb=[0.00, 0.25]")
+    fig.suptitle(metric + " of best TTSGP solutions (50 runs): tmutpb="+_range)
     fig.tight_layout()
     ax1.set_xlabel('generation')
-    ax1.set_ylabel('complexity (tree size)')
+    ax1.set_ylabel(metric)
     ax1.tick_params(axis='y')
 
     # Draw all y axis COMPLEXITY
-    for mut, color, prob in zip(logs, colors, np.arange(0.0, 0.3, 0.05)):
+    for mut, color, prob in zip(logs, colors, _range):
         xax = list(log['gen'] for log in mut)
-        ax1.plot(xax, list(log[measure][1] for log in mut), color=color, alpha=0.6, label=str("prob = " +
-                                                                                              str(round(prob, 2))))
-
+        ax1.plot(xax, list(log[measure][fit] for log in mut), color=color, alpha=0.6, label=str("prob = "+str(round(prob, 2))))
     ax1.legend(loc='center left', bbox_to_anchor=(0.0, 0.85), shadow=False, ncol=1)
     fig.tight_layout()
 
     # Save the figure & display the plot
-    path = Path.cwd() / '..' / 'docs' / 'Figures' / str(fname + '-' + method)
+    path = Path.cwd() / '..' / 'docs' / 'Parameter-tests' / str(fname + '-' + metric + '-' + method)
     plot.savefig(fname=path)
     if show:
         plot.show()
@@ -60,20 +67,20 @@ def draw_time_ascent(logs, probabilities):
     Draws the time of calculation for/e probability run of TTSGP
 
     :param logs: the time logs, a collection of floats
-    :param probabilities:
+    :param probabilities: associated probabilities for each log
     :return:
     """
     fig, ax1 = plot.subplots()
-    fig.suptitle("Execution time for TTSGP (50 runs): tmutpb=[0.00, 0.25]")
+    fig.suptitle("Execution time for TTSGP (50 runs): tmutpb="+_range)
     fig.tight_layout()
     ax1.set_xlabel('transient mutation probability')
     ax1.set_ylabel('execution time (seconds)')
     ax1.tick_params(axis='y')
     ax1.plot(probabilities, logs, color="#B90E0A", alpha=0.6)
-
     fig.tight_layout()
+
     # Save the figure
-    path = Path.cwd() / '..' / 'docs' / 'Figures' / 'mutationdescent-times'
+    path = Path.cwd() / '..' / 'docs' / 'Parameter-tests' / 'mutationdescent-times'
     plot.savefig(fname=path)
     plot.clf()
 
@@ -93,7 +100,7 @@ if __name__ == "__main__":
 
     prob_logs = []
     time_logs = []
-    for prob in np.arange(0.00, 0.3, 0.05):
+    for prob in _range:
         tts_log = []
         tts_best = []
         start_time = time.time()
@@ -110,7 +117,7 @@ if __name__ == "__main__":
 
             # Perform Evolution using Seed
             _best, _log = ttgp.evolve(train_data, train_target, dataset.columns.drop([target]), test_data, test_target,
-                                      tmutpb=prob)
+                                      cxpb=(0.8-(prob-0.1)), tmutpb=prob)
             tts_log.append(_log)
             tts_best.append(_best)
             print("FINISHED EVOLUTION OF POPULATION: ", i)
@@ -129,5 +136,6 @@ if __name__ == "__main__":
         averaged = [{'gen': entry[0], 'best':entry[1][1]} for entry in averaged.iterrows()]
         print("FINISHED EVALUATION OF tmutpb: ", prob)
         prob_logs.append(averaged)
-    draw_mutation_descents(prob_logs, measure='best', method='TTSGP', fname='mutationdescent')
-    draw_time_ascent(time_logs, np.arange(0.0, 0.3, 0.05))
+    draw_mutation_descents(prob_logs, measure='best', method='TTSGP', metric='complexity', fname='mutationdescent')
+    draw_mutation_descents(prob_logs, measure='best', method='TTSGP', metric='accuracy', fname='mutationdescent')
+    draw_time_ascent(time_logs, _range)
