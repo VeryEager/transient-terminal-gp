@@ -174,11 +174,9 @@ def getBalancedInd(pareto):
     :return: the individual
     """
     root = (0, 0)
-    normal_hof = list(pre.normalize([ind.fitness.values for ind in pareto]))
-    print([i.fitness.values for i in pareto])
-    distances = [distance.euclidean(root, ind) +
-                 np.min([distance.euclidean(ind, [p, p]) for p in balance_curve]) for ind in normal_hof]
-    print(distances)
+    scale = max([ind.fitness.values[1] for ind in pareto]) / max([ind.fitness.values[0] for ind in pareto])
+    distances = [[ind.fitness.values[1], ind.fitness.values[0]*scale] for ind in pareto]
+    distances = [distance.euclidean(root, ind) for ind in distances]
     return pareto[distances.index(np.min(distances))]
 
 
@@ -207,3 +205,27 @@ def applyOps(population, toolbox, cxpb, mutpb, tmutpb, tmut=False):
             toolbox.transient_mutate(ind2)
         del ind1.fitness.values, ind2.fitness.values
     return population
+
+
+def draw_pareto(pareto, gen):
+    """
+    Draws the normalized pareto front of an evolution. USED FOR ANALYSIS
+
+    :param pareto: the pareto front to graph
+    :param gen: the current generation (appears in file name)
+    :return:
+    """
+    pareto_x = [i.fitness.values[0] for i in pareto]
+    pareto_y = [i.fitness.values[1] for i in pareto]
+    scaler = max(pareto_y) / max(pareto_x)
+    pareto_x = [ind*scaler for ind in pareto_x]
+    plot.scatter(pareto_x, pareto_y, alpha=0.5)
+    plot.title('Scatter plot pythonspot.com')
+    plot.xlabel('Accuracy')
+    plot.ylabel('Complexity')
+    plot.xlim([0, max(pareto_x)])
+
+    # Save the figure & display the plot
+    path = Path.cwd() / '..' / 'docs' / 'Figures' / str('pareto_front_evo_' + str(gen))
+    plot.savefig(fname=path)
+    plot.clf()

@@ -76,15 +76,15 @@ def evolve(data, labels, names, tdata, tlabels, generations=50, pop_size=100, cx
     pop = toolbox.population(n=pop_size)
     pop = toolbox.selection(pop, len(pop))  # Assigns crowding dist to initial pop
     hof = tools.ParetoFront()
-    stats, logbook = shared.init_logger("gen", "best")
+    stats, logbook = shared.init_logger("gen", "best", "balanced")
 
     # Update initial fitnesses & print log for 0th generation
     fitness = [toolbox.evaluation(function=ind, data=data, actual=labels) for ind in pop]
     for ind, fit in zip([ind for ind in pop if not ind.fitness.valid], fitness):
         ind.fitness.values = fit
     hof.update(pop)
-    logbook.record(gen=0, best=toolbox.evaluation(function=hof[0], data=tdata, actual=tlabels),
-                   **stats.compile(pop))
+    logbook.record(gen=0, best=toolbox.evaluation(function=hof[0], data=tdata, actual=tlabels), balanced=shared
+                   .getBalancedInd(hof).fitness.values, **stats.compile(pop))
     print(logbook.stream)
 
     # Begin evolution of population
@@ -102,8 +102,8 @@ def evolve(data, labels, names, tdata, tlabels, generations=50, pop_size=100, cx
             ind.fitness.values = fit
         pop = toolbox.selection(pop+nextgen, pop_size)
         hof.update(pop)
-        logbook.record(gen=g, best=toolbox.evaluation(function=hof[0], data=tdata, actual=tlabels),
-                       **stats.compile(pop))
+        logbook.record(gen=g, best=toolbox.evaluation(function=hof[0], data=tdata, actual=tlabels), balanced=shared
+                       .getBalancedInd(hof).fitness.values, **stats.compile(pop))
         print(logbook.stream)
 
         # Update Transient Terminal Set for next generation
