@@ -7,6 +7,7 @@ Written by Asher Stout, 300432820
 import sys
 import ttgp
 import shared
+import numpy as np
 import pandas as pd
 import random as rand
 import mogp as mogp
@@ -63,6 +64,10 @@ if __name__ == "__main__":
     # Average the results and report descent & best individual.
     _type = sys.argv[5]
     averaged = ts.average_results(tts_log, _type)
-    shared.draw_descent(averaged, measure=_type, method=sys.argv[4], fname=sys.argv[1]+'-evo-'+_type)
-    shared.draw_solution(tts_best[0], fname=sys.argv[1]+'-ex-'+sys.argv[4])  # TODO: Use the best overall solution, not a random
+    path = Path.cwd() / '..' / 'docs' / 'Data' / str(sys.argv[4]+"-data")
+    np.save(path, averaged)  # Save the results for later visualization
+    ts.draw_solutions_from_data(sys.argv[1], _type, 'complexity', 'mogp-data.npy', 'ttgp-data.npy')
+    ts.draw_solutions_from_data(sys.argv[1], _type, 'accuracy', 'mogp-data.npy', 'ttgp-data.npy')
+    # shared.draw_descent(averaged, measure=_type, method=sys.argv[4], fname=sys.argv[1]+'-evo-'+_type)
+    # shared.draw_solution(tts_best[0], fname=sys.argv[1]+'-ex-'+sys.argv[4])
 

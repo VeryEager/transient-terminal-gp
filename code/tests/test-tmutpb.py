@@ -56,7 +56,7 @@ def draw_mutation_descents(logs, measure, method, metric, show=False, fname='des
     fig.tight_layout()
 
     # Save the figure & display the plot
-    path = Path.cwd() / '..' / 'docs' / 'Parameter-tests' / str(fname + '-' + metric + '-' + method)
+    path = Path.cwd() / '..' / 'docs' / 'Tests' / str(fname + '-' + metric + '-' + method)
     plot.savefig(fname=path)
     if show:
         plot.show()
@@ -81,7 +81,7 @@ def draw_time_ascent(logs, probabilities):
     fig.tight_layout()
 
     # Save the figure
-    path = Path.cwd() / '..' / 'docs' / 'Parameter-tests' / 'mutationdescent-times'
+    path = Path.cwd() / '..' / 'docs' / 'Tests' / 'mutationdescent-times'
     plot.savefig(fname=path)
     plot.clf()
 

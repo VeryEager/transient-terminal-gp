@@ -41,23 +41,21 @@ def draw_threshold_descents(logs, measure, method, metric, show=False, fname='de
 
     # Create plot, add titles & initialize the axes
     fig, ax1 = plot.subplots(figsize=(10, 6))
-    fig.suptitle(metric+" of best TTSGP solutions (50 runs): percentile="+_range)
+    fig.suptitle(metric+" of best TTSGP solutions (50 runs): percentile=["+str(np.min(_range))+', '+str(np.max(_range))+']')
     fig.tight_layout()
     ax1.set_xlabel('generation')
     ax1.set_ylabel(metric)
     ax1.tick_params(axis='y')
 
     # Draw all y axis COMPLEXITY
-    for mut, color, prob in zip(logs, colors, _range):
+    for mut, color, thresh in zip(logs, colors, _range):
         xax = list(log['gen'] for log in mut)
-        ax1.plot(xax, list(log[measure][fit] for log in mut), color=color, alpha=0.6, label=str("percentile = " +
-                                                                                              str(round(prob, 2))))
-
+        ax1.plot(xax, list(log[measure][fit] for log in mut), color=color, alpha=0.6, label=str("thresh = " + str(round(thresh, 2))))
     ax1.legend(loc='center left', bbox_to_anchor=(0.0, 0.85), shadow=False, ncol=1)
     fig.tight_layout()
 
     # Save the figure & display the plot
-    path = Path.cwd() / '..' / 'docs' / 'Parameter-tests' / str(fname + '-' + method)
+    path = Path.cwd() / '..' / 'docs' / 'Tests' / str(fname + '-' + method)
     plot.savefig(fname=path)
     if show:
         plot.show()
@@ -72,16 +70,7 @@ def draw_threshold_tts_effect(logs, measure):
     :param measure: The measure to draw. ONE OF: (tsAvg, tsMed, tsMax, tsLen)
     :return:
     """
-    averaged = []
-    for log in logs:
-        averaged.append([ind[measure] for ind in log])
-    averaged = pd.DataFrame(averaged)
-    acc = [np.mean([entry[0] for entry in averaged[col]]) for col in averaged]
-    com = [np.mean([entry[1] for entry in averaged[col]]) for col in averaged]
-    d = {'gen': [entry['gen'] for entry in logs[0]], measure: zip(acc, com)}
-    averaged = pd.DataFrame(d)  # This collects the average over the runs at each generation
-    averaged = [{'gen': entry[0], measure: entry[1][1]} for entry in averaged.iterrows()]
-
+    averaged = ts.average_results(logs, measure)
 
 
 if __name__ == "__main__":
@@ -97,11 +86,13 @@ if __name__ == "__main__":
     dataset = pd.read_csv(path.resolve(), sep=sys.argv[3])
     target = sys.argv[2]
 
-    prob_logs = []
-    time_logs = []
+    thresh_logs = []
+    avg_logs = []
+    med_logs = []
+    max_logs = []
+    len_logs = []   # Logs for each parameter we want to observe
     for thresh in _range:
         tts_log = []
-        tts_best = []
         # Perform experiments over seeds
         for i, seed in enumerate(shared.seeds):
             rand.seed(seed)
@@ -117,15 +108,22 @@ if __name__ == "__main__":
             ttgp.__set_transient_threshold(thresh)
             _best, _log = ttgp.evolve(train_data, train_target, dataset.columns.drop([target]), test_data, test_target)
             tts_log.append(_log)
-            tts_best.append(_best)
             print("FINISHED EVOLUTION OF POPULATION: ", i)
             break
 
         # Average the results & report descent & best individual.
-        averaged = ts.average_results(tts_log, 'best')
-        prob_logs.append(averaged)
+        best = ts.average_results(tts_log, 'best')
+        thresh_logs.append(best)
+        avg = ts.average_singular_results(tts_log, 'tsAvg')
+        avg_logs.append(avg)
+        med = ts.average_singular_results(tts_log, 'tsMed')
+        med_logs.append(med)
+        max = ts.average_singular_results(tts_log, 'tsMax')
+        max_logs.append(max)
+        len = ts.average_singular_results(tts_log, 'tsLen')
+        len_logs.append(len)
     # Here need to reference the drawing of both complexity & accuracy measures
-    draw_threshold_descents(prob_logs, measure='best', method='TTSGP', metric='complexity', fname='thresholddescent')
-    draw_threshold_descents(prob_logs, measure='best', method='TTSGP', metric='accuracy', fname='thresholddescent')
-    draw_threshold_tts_effect(tts_log, "tsAvg"), draw_threshold_tts_effect(tts_log, "tsMed")
-    draw_threshold_tts_effect(tts_log, "tsMax"), draw_threshold_tts_effect(tts_log, "tsLen")
+    draw_threshold_descents(thresh_logs, measure='best', method='TTSGP', metric='complexity', fname='thresholddescent')
+    draw_threshold_descents(thresh_logs, measure='best', method='TTSGP', metric='accuracy', fname='thresholddescent')
+    draw_threshold_tts_effect(avg_logs, "tsAvg"), draw_threshold_tts_effect(med_logs, "tsMed")
+    draw_threshold_tts_effect(max_logs, "tsMax"), draw_threshold_tts_effect(len_logs, "tsLen")
