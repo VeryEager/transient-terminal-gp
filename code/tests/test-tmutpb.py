@@ -14,6 +14,7 @@ import random as rand
 import numpy as np
 import sklearn.model_selection as skms
 import matplotlib.pyplot as plot
+import test_shared as ts
 from pathlib import Path    # supports inter-OS relative path
 
 colors = ['#1a2a6c', '#272966', '#33285f', '#402759', '#4d2652', '#662545', '#73243f', '#7f2339', '#8c2232', '#99212c',
@@ -124,16 +125,7 @@ if __name__ == "__main__":
         time_logs.append(time.time()-start_time)
 
         # Average the results & report descent & best individual.
-        # TODO: There should be a cleaner way to achieve this.
-        averaged = []
-        for log in tts_log:
-            averaged.append([ind['best'] for ind in log])
-        averaged = pd.DataFrame(averaged)
-        acc = [np.mean([entry[0] for entry in averaged[col]]) for col in averaged]
-        com = [np.mean([entry[1] for entry in averaged[col]]) for col in averaged]
-        d = {'gen': [entry['gen'] for entry in tts_log[0]], 'best': zip(acc, com)}
-        averaged = pd.DataFrame(d)  # This collects the average over the runs at each generation
-        averaged = [{'gen': entry[0], 'best':entry[1][1]} for entry in averaged.iterrows()]
+        averaged = ts.average_results(tts_log, 'best')
         print("FINISHED EVALUATION OF tmutpb: ", prob)
         prob_logs.append(averaged)
     draw_mutation_descents(prob_logs, measure='best', method='TTSGP', metric='complexity', fname='mutationdescent')

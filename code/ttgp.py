@@ -8,6 +8,7 @@ import operator as op
 import shared
 import ttsclasses as tts
 import ttsfunctions as ttsf
+import numpy as np
 
 transient = tts.TransientSet(name="transient", arity=1, lifespan=5)
 
@@ -76,7 +77,7 @@ def evolve(data, labels, names, tdata, tlabels, generations=50, pop_size=100, cx
     pop = toolbox.population(n=pop_size)
     pop = toolbox.selection(pop, len(pop))  # Assigns crowding dist to initial pop
     hof = tools.ParetoFront()
-    stats, logbook = shared.init_logger("gen", "best", "balanced")
+    stats, logbook = shared.init_logger("gen", "best", "balanced", "tsAvg", "tsMed", "tsMax", "tsLen")
 
     # Update initial fitnesses & print log for 0th generation
     fitness = [toolbox.evaluation(function=ind, data=data, actual=labels) for ind in pop]
@@ -84,7 +85,7 @@ def evolve(data, labels, names, tdata, tlabels, generations=50, pop_size=100, cx
         ind.fitness.values = fit
     hof.update(pop)
     logbook.record(gen=0, best=toolbox.evaluation(function=hof[0], data=tdata, actual=tlabels), balanced=shared
-                   .getBalancedInd(hof).fitness.values, **stats.compile(pop))
+                   .getBalancedInd(hof).fitness.values, tsAvg=0, tsMed=0, tsMax=0, tsLen=0, **stats.compile(pop))
     print(logbook.stream)
 
     # Begin evolution of population
@@ -102,8 +103,12 @@ def evolve(data, labels, names, tdata, tlabels, generations=50, pop_size=100, cx
             ind.fitness.values = fit
         pop = toolbox.selection(pop+nextgen, pop_size)
         hof.update(pop)
+        tsavg = np.mean([len(i.tree) for i in transient.transient]) if transient.trans_count > 0 else 0
+        tsmed = np.median([len(i.tree) for i in transient.transient]) if transient.trans_count > 0 else 0
+        tsmax = np.max([len(i.tree) for i in transient.transient]) if transient.trans_count > 0 else 0
         logbook.record(gen=g, best=toolbox.evaluation(function=hof[0], data=tdata, actual=tlabels), balanced=shared
-                       .getBalancedInd(hof).fitness.values, **stats.compile(pop))
+                       .getBalancedInd(hof).fitness.values, tsAvg=tsavg, tsMed=tsmed, tsMax=tsmax,
+                       tsLen=transient.trans_count, **stats.compile(pop))
         print(logbook.stream)
 
         # Update Transient Terminal Set for next generation

@@ -13,6 +13,7 @@ import random as rand
 import numpy as np
 import sklearn.model_selection as skms
 import matplotlib.pyplot as plot
+import test_shared as ts
 from pathlib import Path    # supports inter-OS relative path
 
 colors = ['#1a2a6c', '#272966', '#33285f', '#402759', '#4d2652', '#59254c', '#662545', '#73243f', '#7f2339', '#8c2232',
@@ -63,6 +64,26 @@ def draw_threshold_descents(logs, measure, method, metric, show=False, fname='de
     plot.clf()
 
 
+def draw_threshold_tts_effect(logs, measure):
+    """
+    Draws the threshold effect on a value from the TTS.
+
+    :param logs: The logs to draw from
+    :param measure: The measure to draw. ONE OF: (tsAvg, tsMed, tsMax, tsLen)
+    :return:
+    """
+    averaged = []
+    for log in logs:
+        averaged.append([ind[measure] for ind in log])
+    averaged = pd.DataFrame(averaged)
+    acc = [np.mean([entry[0] for entry in averaged[col]]) for col in averaged]
+    com = [np.mean([entry[1] for entry in averaged[col]]) for col in averaged]
+    d = {'gen': [entry['gen'] for entry in logs[0]], measure: zip(acc, com)}
+    averaged = pd.DataFrame(d)  # This collects the average over the runs at each generation
+    averaged = [{'gen': entry[0], measure: entry[1][1]} for entry in averaged.iterrows()]
+
+
+
 if __name__ == "__main__":
     """
     README: accepts three command line arguments
@@ -101,18 +122,10 @@ if __name__ == "__main__":
             break
 
         # Average the results & report descent & best individual.
-        # TODO: There should be a cleaner way to achieve this.
-        averaged = []
-        for log in tts_log:
-            averaged.append([ind['best'] for ind in log])
-        averaged = pd.DataFrame(averaged)
-        acc = [np.mean([entry[0] for entry in averaged[col]]) for col in averaged]
-        com = [np.mean([entry[1] for entry in averaged[col]]) for col in averaged]
-        d = {'gen': [entry['gen'] for entry in tts_log[0]], 'best': zip(acc, com)}
-        averaged = pd.DataFrame(d)  # This collects the average over the runs at each generation
-        averaged = [{'gen': entry[0], 'best': entry[1][1]} for entry in averaged.iterrows()]
-        print("FINISHED EVALUATION OF thresh: ", thresh)
+        averaged = ts.average_results(tts_log, 'best')
         prob_logs.append(averaged)
     # Here need to reference the drawing of both complexity & accuracy measures
     draw_threshold_descents(prob_logs, measure='best', method='TTSGP', metric='complexity', fname='thresholddescent')
     draw_threshold_descents(prob_logs, measure='best', method='TTSGP', metric='accuracy', fname='thresholddescent')
+    draw_threshold_tts_effect(tts_log, "tsAvg"), draw_threshold_tts_effect(tts_log, "tsMed")
+    draw_threshold_tts_effect(tts_log, "tsMax"), draw_threshold_tts_effect(tts_log, "tsLen")
