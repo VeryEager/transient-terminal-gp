@@ -60,10 +60,9 @@ if __name__ == "__main__":
         tts_best.append(_best)
         print("FINISHED EVOLUTION OF GENERATION: ", i)
 
-    # Average the results & report descent & best individual.
-    # TODO: There should be a cleaner way to achieve this.
-    averaged = ts.average_results(tts_log, 'best')
-
+    # Average the results and report descent & best individual.
+    _type = sys.argv[5]
+    averaged = ts.average_results(tts_log, _type)
     shared.draw_descent(averaged, measure=_type, method=sys.argv[4], fname=sys.argv[1]+'-evo-'+_type)
     shared.draw_solution(tts_best[0], fname=sys.argv[1]+'-ex-'+sys.argv[4])  # TODO: Use the best overall solution, not a random
 
