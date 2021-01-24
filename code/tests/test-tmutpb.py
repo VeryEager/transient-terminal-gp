@@ -52,7 +52,7 @@ def draw_mutation_descents(logs, measure, method, metric, show=False, fname='des
     for mut, color, prob in zip(logs, colors, _range):
         xax = list(log['gen'] for log in mut)
         ax1.plot(xax, list(log[measure][fit] for log in mut), color=color, alpha=0.6, label=str("prob = "+str(round(prob, 2))))
-    ax1.legend(loc='center left', bbox_to_anchor=(0.0, 0.85), shadow=False, ncol=1)
+        plot.text(49.5, mut[49][measure][fit], str(prob), horizontalalignment='left', size='small', color=color)
     fig.tight_layout()
 
     # Save the figure & display the plot
@@ -123,7 +123,6 @@ if __name__ == "__main__":
             tts_best.append(_best)
             print("FINISHED EVOLUTION OF POPULATION: ", i)
         time_logs.append(time.time()-start_time)
-
         # Average the results & report descent & best individual.
         averaged = ts.average_results(tts_log, 'best')
         print("FINISHED EVALUATION OF tmutpb: ", prob)
