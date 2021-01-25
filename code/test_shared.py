@@ -61,7 +61,6 @@ def draw_solutions_from_data(fname, measure, fitness, *args):
     :return:
     """
     logs = [np.load(Path.cwd() / '..' / 'docs' / 'Data' / arg, allow_pickle=True) for arg in args]
-    c = "-data.npy"
     i = 0
     s = "(RMSE)"
     if fitness == "complexity":
@@ -77,7 +76,7 @@ def draw_solutions_from_data(fname, measure, fitness, *args):
     for file, color, arg in zip(logs, log_colors, args):
         # Draw first y axis ACCURACY
         ax1.set_ylabel(fitness+' '+s)
-        ax1.plot(xax, list(log[measure][i] for log in file), color=color, alpha=0.6, label=arg.replace(c, ''))
+        ax1.plot(xax, list(log[measure][i] for log in file), color=color, alpha=0.6, label=arg.split("-")[2])
         ax1.tick_params(axis='y')
         fig.tight_layout()
     ax1.legend(loc='center left', bbox_to_anchor=(0.0, 0.9), shadow=False, ncol=1)
@@ -86,3 +85,18 @@ def draw_solutions_from_data(fname, measure, fitness, *args):
     path = Path.cwd() / '..' / 'docs' / 'Figures' / str(fname+'-'+fitness+'-'+measure)
     plot.savefig(fname=path)
     plot.clf()
+
+
+def print_solutions_from_data(measure, *args):
+    """
+    Prints the *measure* solution's fitness at the 50th generation. NOTE: ARGUMENT POSITIONS ARE HARDCODED, FIRST SHOULD
+    ALWAYS BE MOGP, SECOND TTGP.
+
+    :param measure: the measure to print, ONE OF: (best, balanced)
+    :param args: files to print from
+    :return:
+    """
+    logs = [np.load(Path.cwd() / '..' / 'docs' / 'Data' / arg, allow_pickle=True) for arg in args]
+    print(args[0])
+    print("MOGP", logs[0][49][measure])
+    print("TTGP", logs[1][49][measure], '\n')

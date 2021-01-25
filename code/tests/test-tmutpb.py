@@ -53,7 +53,6 @@ def draw_mutation_descents(logs, measure, method, metric, show=False, fname='des
         xax = list(log['gen'] for log in mut)
         ax1.plot(xax, list(log[measure][fit] for log in mut), color=color, alpha=0.6, label=str("prob = "+str(round(prob, 2))))
         plot.text(49.5, mut[49][measure][fit], str(prob), horizontalalignment='left', size='small', color=color)
-    fig.tight_layout()
 
     # Save the figure & display the plot
     path = Path.cwd() / '..' / 'docs' / 'Tests' / str(fname + '-' + metric + '-' + method)

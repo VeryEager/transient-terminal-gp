@@ -23,7 +23,7 @@ if __name__ == "__main__":
     arg2: name of the dataset's target variable 
     arg3: separator character (usually ';' or ',' - CHECK DATASET PRIOR
     arg4: string representing the method used. ONE OF: (sgp, mogp, ttsgp)
-    arg5: string which individual to plot. ONE OF: (best, balanced)
+    arg5: string which individual to plot. ONE OF: (best, balanced, both)
     
     """
     # Configure evolutionary method from command-line argument
@@ -63,11 +63,15 @@ if __name__ == "__main__":
 
     # Average the results and report descent & best individual.
     _type = sys.argv[5]
-    averaged = ts.average_results(tts_log, _type)
-    path = Path.cwd() / '..' / 'docs' / 'Data' / str(sys.argv[1]+"-"+sys.argv[4]+"-"+sys.argv[5])
-    np.save(path, averaged)  # Save the results for later visualization
+    best = ts.average_results(tts_log, 'best')
+    balance = ts.average_results(tts_log, 'balanced')
+    path = Path.cwd() / '..' / 'docs' / 'Data' / str(sys.argv[1]+"-"+sys.argv[4]+"-best")
+    np.save(path, best)  # Save the results for later visualization
+    path = Path.cwd() / '..' / 'docs' / 'Data' / str(sys.argv[1]+"-"+sys.argv[4]+"-balance")
+    np.save(path, balance)  # Save the results for later visualization
+
+    # Extra code for drawing solutions from data/logs
     # ts.draw_solutions_from_data(sys.argv[1], _type, 'complexity', 'mogp-data.npy', 'ttgp-data.npy')
     # ts.draw_solutions_from_data(sys.argv[1], _type, 'accuracy', 'mogp-data.npy', 'ttgp-data.npy')
-    shared.draw_descent(averaged, measure=_type, method=sys.argv[4], fname=sys.argv[1]+'-evo-'+_type)
+    # shared.draw_descent(averaged, measure=_type, method=sys.argv[4], fname=sys.argv[1]+'-evo-'+_type)
     # shared.draw_solution(tts_best[0], fname=sys.argv[1]+'-ex-'+sys.argv[4])
-
