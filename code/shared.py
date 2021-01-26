@@ -22,7 +22,6 @@ seeds = [39256911, 933855996, 967670959, 968137054, 590138938, 297331027, 755510
          87347336, 80635188, 661477758, 785773283, 950108759, 223073113, 309659173, 670766008, 370663937, 77914081,
          74406820, 94203230, 510105635, 717950752, 895387929, 865939420, 696230280, 695258916, 241343355, 720042387,
          232736156, 424335977, 353975857, 517983807, 674857291, 139546984, 446846029, 69735089, 876193725, 323506402]
-balance_curve = np.arange(0, 1.0, 0.01)  # Used as a ref for 'balanced' solutions when selecting which is the best
 
 def protected_division(x, y):
     """
@@ -198,11 +197,11 @@ def applyOps(population, toolbox, cxpb, mutpb, tmutpb, tmut=False):
         if op_choice < cxpb:  # Apply crossover
             ind1, ind2 = toolbox.mate(ind1, ind2)
         elif op_choice < cxpb+mutpb or not tmut:  # Apply mutation, OR when transient mutation isn't available
-            toolbox.mutate(ind1)
-            toolbox.mutate(ind2)
+            ind1, = toolbox.mutate(ind1)
+            ind2, = toolbox.mutate(ind2)
         elif op_choice < cxpb+mutpb+tmutpb:  # Apply transient mutation
-            toolbox.transient_mutate(ind1)
-            toolbox.transient_mutate(ind2)
+            ind1, = toolbox.transient_mutate(ind1)
+            ind2, = toolbox.transient_mutate(ind2)
         del ind1.fitness.values, ind2.fitness.values
     return population
 
