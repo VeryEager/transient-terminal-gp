@@ -64,9 +64,12 @@ if __name__ == "__main__":
     # Average the results and report descent & best individual.
     _type = sys.argv[5]
     best = ts.average_results(tts_log, 'best')
+    besttrain = ts.average_results(tts_log, 'besttrain')
     balance = ts.average_results(tts_log, 'balanced')
     path = Path.cwd() / '..' / 'docs' / 'Data' / str(sys.argv[1]+"-"+sys.argv[4]+"-best")
     np.save(path, best)  # Save the results for later visualization
+    path = Path.cwd() / '..' / 'docs' / 'Data' / str(sys.argv[1]+"-"+sys.argv[4]+"-besttrain")
+    np.save(path, besttrain)  # Save the results for later visualization
     path = Path.cwd() / '..' / 'docs' / 'Data' / str(sys.argv[1]+"-"+sys.argv[4]+"-balance")
     np.save(path, balance)  # Save the results for later visualization
 

@@ -173,7 +173,7 @@ def getBalancedInd(pareto):
     :return: the individual
     """
     root = (0, 0)
-    scale = protected_division([ind.fitness.values[1] for ind in pareto], max([ind.fitness.values[0] for ind in pareto]))
+    scale = protected_division(max([ind.fitness.values[1] for ind in pareto]), max([ind.fitness.values[0] for ind in pareto]))
     distances = [[ind.fitness.values[1], ind.fitness.values[0]*scale] for ind in pareto]
     distances = [distance.euclidean(root, ind) for ind in distances]
     return pareto[distances.index(np.min(distances))]
