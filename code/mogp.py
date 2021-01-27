@@ -57,7 +57,7 @@ def evolve(data, labels, names, tdata, tlabels, generations=50, pop_size=100, cx
     toolbox = base.Toolbox()
     primitives = shared.create_primitives(names, data.shape[1])
     create_definitions(toolbox, primitives)
-    stats, logbook = shared.init_logger("gen", "best", "balanced")
+    stats, logbook = shared.init_logger("gen", "best", "besttrain", "balanced")
     pop = toolbox.population(n=pop_size)
     nextgen = toolbox.selection(pop, len(pop))  # Assigns crowding dist to initial pop
     hof = tools.ParetoFront()
@@ -67,8 +67,8 @@ def evolve(data, labels, names, tdata, tlabels, generations=50, pop_size=100, cx
     for ind, fit in zip([ind for ind in pop if not ind.fitness.valid], fitness):
         ind.fitness.values = fit
     hof.update(pop)
-    logbook.record(gen=0, best=toolbox.evaluation(function=hof[0], data=tdata, actual=tlabels), balanced=shared
-                   .getBalancedInd(hof).fitness.values, **stats.compile(pop))
+    logbook.record(gen=0, best=toolbox.evaluation(function=hof[0], data=tdata, actual=tlabels), besttrain=hof[0].fitness.values,
+                   balanced=shared.getBalancedInd(hof).fitness.values, **stats.compile(pop))
     print(logbook.stream)
 
     # Begin evolution of population
@@ -84,7 +84,7 @@ def evolve(data, labels, names, tdata, tlabels, generations=50, pop_size=100, cx
             ind.fitness.values = fit
         pop = toolbox.selection(pop+nextgen, pop_size)
         hof.update(pop)
-        logbook.record(gen=g, best=toolbox.evaluation(function=hof[0], data=tdata, actual=tlabels), balanced=shared
-                   .getBalancedInd(hof).fitness.values, **stats.compile(pop))
+        logbook.record(gen=g, best=toolbox.evaluation(function=hof[0], data=tdata, actual=tlabels), besttrain=hof[0].fitness.values,
+                       balanced=shared.getBalancedInd(hof).fitness.values, **stats.compile(pop))
         print(logbook.stream)
     return hof[0], logbook

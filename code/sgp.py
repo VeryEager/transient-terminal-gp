@@ -84,7 +84,7 @@ def evolve(data, labels, names, tdata, tlabels, generations=50, pop_size=100, cx
     toolbox = base.Toolbox()
     primitives = shared.create_primitives(names, data.shape[1])
     create_definitions(toolbox, primitives)
-    stats, logbook = shared.init_logger("gen", "best")
+    stats, logbook = shared.init_logger("gen", "best", "besttrain", "balanced")
     pop = toolbox.population(n=pop_size)
     hof = tools.ParetoFront()
 
@@ -93,7 +93,8 @@ def evolve(data, labels, names, tdata, tlabels, generations=50, pop_size=100, cx
     for ind, fit in zip([ind for ind in pop if not ind.fitness.valid], fitness):
         ind.fitness.values = fit
     hof.update(pop)
-    logbook.record(gen=0, best=tuple(list(toolbox.evaluation(function=hof[0], data=tdata, actual=tlabels))+[len(hof[0])]), **stats.compile(pop))
+    logbook.record(gen=0, best=tuple(list(toolbox.evaluation(function=hof[0], data=tdata, actual=tlabels))+[len(hof[0])]),
+                   besttrain=hof[0].fitness.values, balanced=hof[0].fitness.values, **stats.compile(pop))
     print(logbook.stream)
 
     # Begin evolution of population
@@ -111,7 +112,8 @@ def evolve(data, labels, names, tdata, tlabels, generations=50, pop_size=100, cx
             ind.fitness.values = fit
         pop[:] = nextgen
         hof.update(nextgen)
-        logbook.record(gen=g, best=tuple(list(toolbox.evaluation(function=hof[0], data=tdata, actual=tlabels))+[len(hof[0])]), **stats.compile(pop))
+        logbook.record(gen=g, best=tuple(list(toolbox.evaluation(function=hof[0], data=tdata, actual=tlabels))+[len(hof[0])]),
+                       besttrain=hof[0].fitness.values, balanced=hof[0].fitness.values, **stats.compile(pop))
         print(logbook.stream)
 
         # Update Transient Terminal Set for next generation
