@@ -23,7 +23,7 @@ if __name__ == "__main__":
     arg2: name of the dataset's target variable 
     arg3: separator character (usually ';' or ',' - CHECK DATASET PRIOR
     arg4: string representing the method used. ONE OF: (sgp, mogp, ttsgp)
-    arg5: string which individual to plot. ONE OF: (best, balanced, both)
+    arg5: OPTIONAL string which individual to plot. ONE OF: (best, balanced, both)
     
     """
     # Configure evolutionary method from command-line argument
@@ -62,7 +62,6 @@ if __name__ == "__main__":
         print("FINISHED EVOLUTION OF GENERATION: ", i)
 
     # Average the results and report descent & best individual.
-    _type = sys.argv[5]
     best = ts.average_results(tts_log, 'best')
     besttrain = ts.average_results(tts_log, 'besttrain')
     balance = ts.average_results(tts_log, 'balanced')
