@@ -18,7 +18,7 @@ from scipy.spatial import distance       # for identifying best balanced solutio
 
 
 seeds = [39256911, 933855996, 967670959, 968137054, 590138938, 297331027, 755510051, 692539982, 955575529, 462966506,
-         575520985, 614618594, 689935942, 638114944, 691154779, 224772871, 822094948, 811947924, 259107591, 784778275,
+         575520985, 614618594, 689935942,638114944, 691154779, 224772871, 822094948, 811947924, 259107591, 784778275,
          87347336, 80635188, 661477758, 785773283, 950108759, 223073113, 309659173, 670766008, 370663937, 77914081,
          74406820, 94203230, 510105635, 717950752, 895387929, 865939420, 696230280, 695258916, 241343355, 720042387,
          232736156, 424335977, 353975857, 517983807, 674857291, 139546984, 446846029, 69735089, 876193725, 323506402]
@@ -192,6 +192,7 @@ def applyOps(population, toolbox, cxpb, mutpb, tmutpb, tmut=False):
     :return:
     """
     # Individuals are evolved pairwise
+    nextgen = []
     for ind1, ind2 in zip(population[::2], population[1::2]):
         op_choice = rand.random()
         if op_choice < cxpb:  # Apply crossover
@@ -203,7 +204,9 @@ def applyOps(population, toolbox, cxpb, mutpb, tmutpb, tmut=False):
             ind1, = toolbox.transient_mutate(ind1)
             ind2, = toolbox.transient_mutate(ind2)
         del ind1.fitness.values, ind2.fitness.values
-    return population
+        nextgen.append(ind1)
+        nextgen.append(ind2)
+    return nextgen
 
 
 def draw_pareto(pareto, gen):

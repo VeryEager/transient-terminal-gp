@@ -64,13 +64,13 @@ if __name__ == "__main__":
     # Average the results and report descent & best individual.
     best = ts.average_results(tts_log, 'best')
     besttrain = ts.average_results(tts_log, 'besttrain')
-    balance = ts.average_results(tts_log, 'balanced')
+    # balance = ts.average_results(tts_log, 'balanced')
     path = Path.cwd() / '..' / 'docs' / 'Data' / str(sys.argv[1]+"-"+sys.argv[4]+"-best")
     np.save(path, best)  # Save the results for later visualization
     path = Path.cwd() / '..' / 'docs' / 'Data' / str(sys.argv[1]+"-"+sys.argv[4]+"-besttrain")
     np.save(path, besttrain)  # Save the results for later visualization
-    path = Path.cwd() / '..' / 'docs' / 'Data' / str(sys.argv[1]+"-"+sys.argv[4]+"-balance")
-    np.save(path, balance)  # Save the results for later visualization
+    # path = Path.cwd() / '..' / 'docs' / 'Data' / str(sys.argv[1]+"-"+sys.argv[4]+"-balance")
+    # np.save(path, balance)  # Save the results for later visualization
 
     # Extra code for drawing solutions from data/logs
     # ts.draw_solutions_from_data(sys.argv[1], _type, 'complexity', 'mogp-data.npy', 'ttgp-data.npy')

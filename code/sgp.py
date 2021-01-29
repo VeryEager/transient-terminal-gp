@@ -94,7 +94,7 @@ def evolve(data, labels, names, tdata, tlabels, generations=50, pop_size=100, cx
         ind.fitness.values = fit
     hof.update(pop)
     logbook.record(gen=0, best=tuple(list(toolbox.evaluation(function=hof[0], data=tdata, actual=tlabels))+[len(hof[0])]),
-                   besttrain=tuple([hof[0].fitness.values]+[len(hof[0])]), balanced=hof[0].fitness.values, **stats.compile(pop))
+                   besttrain=tuple(list(hof[0].fitness.values)+[len(hof[0])]), balanced=hof[0].fitness.values, **stats.compile(pop))
     print(logbook.stream)
 
     # Begin evolution of population
@@ -113,7 +113,7 @@ def evolve(data, labels, names, tdata, tlabels, generations=50, pop_size=100, cx
         pop[:] = nextgen
         hof.update(nextgen)
         logbook.record(gen=g, best=tuple(list(toolbox.evaluation(function=hof[0], data=tdata, actual=tlabels))+[len(hof[0])]),
-                       besttrain=hof[0].fitness.values, balanced=hof[0].fitness.values, **stats.compile(pop))
+                       besttrain=tuple(list(hof[0].fitness.values)+[len(hof[0])]), balanced=hof[0].fitness.values, **stats.compile(pop))
         print(logbook.stream)
 
         # Update Transient Terminal Set for next generation
