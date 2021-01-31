@@ -3,10 +3,11 @@ Contains code for the MOGP algorithm using DEAP.
 
 Written by Asher Stout, 300432820
 """
+import shared
+import time
+import operator as op
 from deap import base, creator, tools, gp
 from deap.algorithms import varOr
-import operator as op
-import shared
 
 
 def create_definitions(tb, pset):
@@ -51,7 +52,7 @@ def evolve(data, labels, names, tdata, tlabels, generations=50, pop_size=100, cx
     :param cxpb: crossover probability
     :param mutpb: mutation probability
 
-    :return: the best individual of the evolution & the log
+    :return: the evolutionary log, best individual, evolution runtime over 'generations' generations
     """
     # Initialize toolbox, population, hof, and logs
     toolbox = base.Toolbox()
@@ -71,6 +72,9 @@ def evolve(data, labels, names, tdata, tlabels, generations=50, pop_size=100, cx
                    balanced=shared.getBalancedInd(hof).fitness.values, **stats.compile(pop))
     print(logbook.stream)
 
+    # Record initial time
+    start_time = time.time()
+
     # Begin evolution of population
     for g in range(1, generations):
         nextgen = tools.selTournamentDCD(pop, len(pop))
@@ -87,4 +91,6 @@ def evolve(data, labels, names, tdata, tlabels, generations=50, pop_size=100, cx
         logbook.record(gen=g, best=toolbox.evaluation(function=hof[0], data=tdata, actual=tlabels), besttrain=hof[0].fitness.values,
                        balanced=shared.getBalancedInd(hof).fitness.values, **stats.compile(pop))
         print(logbook.stream)
-    return hof[0], logbook
+
+    runtime = time.time()-start_time
+    return logbook, hof[0], runtime

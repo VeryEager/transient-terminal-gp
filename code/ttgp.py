@@ -3,12 +3,14 @@ Contains code for the transient-terminal GP algorithm using DEAP.
 
 Written by Asher Stout, 300432820
 """
-from deap import base, creator, tools, gp
-import operator as op
 import shared
+import time
+import operator as op
 import ttsclasses as tts
 import ttsfunctions as ttsf
 import numpy as np
+from deap import base, creator, tools, gp
+
 
 transient = tts.TransientSet(name="transient", arity=1, lifespan=5)
 
@@ -68,7 +70,7 @@ def evolve(data, labels, names, tdata, tlabels, generations=50, pop_size=100, cx
     :param mutpb: mutation probability
     :param tmutpb: transient mutation probability
 
-    :return: the best individual of the evolution & the log
+    :return: the evolutionary log, best individual, evolution runtime over 'generations' generations
     """
     # Initialize toolbox, population, hof, and logs
     toolbox = base.Toolbox()
@@ -88,6 +90,9 @@ def evolve(data, labels, names, tdata, tlabels, generations=50, pop_size=100, cx
                    .values, balanced=shared.getBalancedInd(hof).fitness.values, tsAvg=0, tsMed=0, tsMax=0, tsLen=0,
                    **stats.compile(pop))
     print(logbook.stream)
+
+    # Record initial time
+    start_time = time.time()
 
     # Begin evolution of population
     for g in range(1, generations):
@@ -114,4 +119,6 @@ def evolve(data, labels, names, tdata, tlabels, generations=50, pop_size=100, cx
 
         # Update Transient Terminal Set for next generation
         transient.update_set(pop, g)
-    return hof[0], logbook
+
+    runtime = time.time()-start_time
+    return logbook, hof[0], runtime,
