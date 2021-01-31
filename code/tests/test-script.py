@@ -23,7 +23,8 @@ if __name__ == "__main__":
     arg2: name of the dataset's target variable 
     arg3: separator character (usually ';' or ',' - CHECK DATASET PRIOR
     arg4: string representing the method used. ONE OF: (sgp, mogp, ttsgp)
-    arg5: OPTIONAL string which individual to plot. ONE OF: (best, balanced, both)
+    arg5: int GENERATIONS
+    arg6: int POPSIZE
     
     """
     # Configure evolutionary method from command-line argument
@@ -56,24 +57,22 @@ if __name__ == "__main__":
         test_target = test[target].values
 
         # Perform Evolution using Seed
-        _best, _log = method.evolve(train_data, train_target, dataset.columns.drop([target]), test_data, test_target)
+        _best, _log = method.evolve(train_data, train_target, dataset.columns.drop([target]), test_data, test_target,
+                                    generations=sys.argv[5], pop_size=sys.argv[6])
         tts_log.append(_log)
         tts_best.append(_best)
         print("FINISHED EVOLUTION OF GENERATION: ", i)
 
-    # Average the results and report descent & best individual.
+    # Average and save results in data file for best, besttrain, and balanced (on condition)
     best = ts.average_results(tts_log, 'best')
-    besttrain = ts.average_results(tts_log, 'besttrain')
-    # balance = ts.average_results(tts_log, 'balanced')
-    path = Path.cwd() / '..' / 'docs' / 'Data' / str(sys.argv[1]+"-"+sys.argv[4]+"-best")
+    path = Path.cwd() / '..' / 'docs' / 'Data' / str(sys.argv[1]+"-"+sys.argv[4]+"-best-"+sys.argv[5]+'-'+sys.argv[6])
     np.save(path, best)  # Save the results for later visualization
-    path = Path.cwd() / '..' / 'docs' / 'Data' / str(sys.argv[1]+"-"+sys.argv[4]+"-besttrain")
-    np.save(path, besttrain)  # Save the results for later visualization
-    # path = Path.cwd() / '..' / 'docs' / 'Data' / str(sys.argv[1]+"-"+sys.argv[4]+"-balance")
-    # np.save(path, balance)  # Save the results for later visualization
 
-    # Extra code for drawing solutions from data/logs
-    # ts.draw_solutions_from_data(sys.argv[1], _type, 'complexity', 'mogp-data.npy', 'ttgp-data.npy')
-    # ts.draw_solutions_from_data(sys.argv[1], _type, 'accuracy', 'mogp-data.npy', 'ttgp-data.npy')
-    # shared.draw_descent(averaged, measure=_type, method=sys.argv[4], fname=sys.argv[1]+'-evo-'+_type)
-    # shared.draw_solution(tts_best[0], fname=sys.argv[1]+'-ex-'+sys.argv[4])
+    besttrain = ts.average_results(tts_log, 'besttrain')
+    path = Path.cwd() / '..' / 'docs' / 'Data' / str(sys.argv[1]+"-"+sys.argv[4]+"-besttrain"+sys.argv[5]+'-'+sys.argv[6])
+    np.save(path, besttrain)  # Save the results for later visualization
+
+    if method != 'sgp':  # Single-objective GP does not record balanced individual.
+        balance = ts.average_results(tts_log, 'balanced')
+        path = Path.cwd() / '..' / 'docs' / 'Data' / str(sys.argv[1]+"-"+sys.argv[4]+"-balance"+sys.argv[5]+'-'+sys.argv[6])
+        np.save(path, balance)  # Save the results for later visualization
