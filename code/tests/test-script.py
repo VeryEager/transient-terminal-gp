@@ -5,13 +5,14 @@ Written by Asher Stout, 300432820
 """
 
 import sys
-import ttgp
 import shared
 import numpy as np
 import pandas as pd
 import random as rand
-import mogp as mogp
+import ttgp
+import mogp
 import sottgp
+import sogp
 import sklearn.model_selection as skms
 import test_shared as ts
 from pathlib import Path    # supports inter-OS relative path
@@ -35,6 +36,8 @@ if __name__ == "__main__":
         method = mogp
     elif method == "ttgp":
         method = ttgp
+    elif method == 'sogp':
+        method = sogp
     else:
         print("UNKNOWN METHOD: MUST BE ONE OF (sgp, mogp, ttgp)")
 
@@ -78,7 +81,7 @@ if __name__ == "__main__":
     path = Path.cwd() / '..' / 'docs' / 'Data' / str(sys.argv[1]+"-"+sys.argv[4]+"-time-g"+sys.argv[5]+'-p'+sys.argv[6])
     np.save(path, tts_time)
 
-    if method != sottgp and method != 'sogp':  # Single-objective GP does not record balanced individual.
+    if method != sottgp and method != sogp:  # Single-objective GP does not record balanced individual.
         balance = ts.average_results(tts_log, 'balanced')
         path = Path.cwd() / '..' / 'docs' / 'Data' / str(sys.argv[1]+"-"+sys.argv[4]+"-balance-g"+sys.argv[5]+'-p'+sys.argv[6])
         np.save(path, balance)  # Save the results for later visualization

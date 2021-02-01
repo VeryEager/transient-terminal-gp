@@ -47,7 +47,7 @@ def create_definitions(tb, pset):
     tb.decorate("mutate", gp.staticLimit(key=op.attrgetter('height'), max_value=10))
     tb.register("expr_trans_mut", ttsf.genRand)
     tb.register("transient_mutate", ttsf.transientMutUniform, expr=tb.expr_trans_mut, pset=transient)
-    tb.decorate("transient_mutate", gp.staticLimit(key=op.attrgetter('height'), max_value=90))
+    tb.decorate("transient_mutate", gp.staticLimit(key=op.attrgetter('height'), max_value=10))
 
     # Register selection, evaluation, compiliation
     tb.register("selection", tools.selNSGA2)
