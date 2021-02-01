@@ -58,11 +58,11 @@ def create_definitions(tb, pset):
     tb.register("mate", gp.cxOnePoint)
     tb.register("expr_mut", gp.genFull, min_=1, max_=3)
     tb.register("mutate", gp.mutUniform, expr=tb.expr_mut, pset=pset)
-    tb.decorate("mate", gp.staticLimit(key=op.attrgetter("height"), max_value=90))
-    tb.decorate("mutate", gp.staticLimit(key=op.attrgetter("height"), max_value=90))
+    tb.decorate("mate", gp.staticLimit(key=op.attrgetter("height"), max_value=10))
+    tb.decorate("mutate", gp.staticLimit(key=op.attrgetter("height"), max_value=10))
     tb.register("expr_trans_mut", ttsf.genRand)
     tb.register("transient_mutate", ttsf.transientMutUniform, expr=tb.expr_trans_mut, pset=transient)
-    tb.decorate("transient_mutate", gp.staticLimit(key=op.attrgetter('height'), max_value=90))
+    tb.decorate("transient_mutate", gp.staticLimit(key=op.attrgetter('height'), max_value=10))
 
 
 def evolve(data, labels, names, tdata, tlabels, generations=50, pop_size=100, cxpb=0.9, mutpb=0.1, tmutpb=0.1):
