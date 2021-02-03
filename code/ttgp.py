@@ -100,12 +100,7 @@ def evolve(data, labels, names, tdata, tlabels, generations=50, pop_size=100, cx
         for ind in pop:
             ind.update_last()  # Update the metadata on evolution prior to this generation's evolution
         nextgen = tools.selTournamentDCD(pop, len(pop))
-        # nextgen = [toolbox.clone(ind) for ind in nextgen]
-        newgen = []
-        for ind in nextgen:
-            print(ind)
-            newgen.append(toolbox.clone(ind))
-        nextgen = newgen
+        nextgen = [toolbox.clone(ind) for ind in nextgen]
         nextgen = shared.applyOps(nextgen, toolbox, cxpb, mutpb, tmutpb, (transient.trans_count > 0))
 
         # Update fitness & population, update HoF, record generation log
