@@ -89,8 +89,7 @@ def draw_solutions_from_data(fname, measure, fitness, *args):
 
 def print_solutions_from_data(measure, *args):
     """
-    Prints the *measure* solution's fitness at the 50th generation. NOTE: ARGUMENT POSITIONS ARE HARDCODED, FIRST SHOULD
-    ALWAYS BE MOGP, SECOND TTGP.
+    Prints the *measure* solution's fitness at the 50th generation.
 
     :param measure: the measure to print, ONE OF: (best, balanced)
     :param args: files to print from
@@ -98,5 +97,7 @@ def print_solutions_from_data(measure, *args):
     """
     logs = [np.load(Path.cwd() / '..' / 'docs' / 'Data' / arg, allow_pickle=True) for arg in args]
     print(args[0])
-    print("MOGP", logs[0][49][measure])
-    print("TTGP", logs[1][49][measure], '\n')
+    if measure != 'time':
+        print(logs[0][49][measure])
+    else:
+        print(np.mean(logs[0]))
