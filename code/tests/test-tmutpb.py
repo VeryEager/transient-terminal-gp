@@ -121,13 +121,11 @@ if __name__ == "__main__":
             tts_log.append(_log)
             tts_best.append(_best)
             print("FINISHED EVOLUTION OF POPULATION: ", i)
-            break
         time_logs.append(time.time()-start_time)
         # Average the results & report descent & best individual.
         averaged = ts.average_results(tts_log, 'best')
         print("FINISHED EVALUATION OF tmutpb: ", prob)
         prob_logs.append(averaged)
-        break
     # Save results for later evaluation
     path = Path.cwd() / '..' / 'docs' / 'Data' / str('tmutpb-eval-best-'+sys.argv[1])
     np.save(path, prob_logs)
