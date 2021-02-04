@@ -123,7 +123,8 @@ if __name__ == "__main__":
 
             # Perform Evolution using Seed
             ttgp.__set_transient_threshold(thresh)
-            _log, _best, _time = ttgp.evolve(train_data, train_target, dataset.columns.drop([target]), test_data, test_target)
+            _log, _best, _time = ttgp.evolve(train_data, train_target, dataset.columns.drop([target]), test_data,
+                                             test_target, pop_size=500, generations=50)
             tts_log.append(_log)
             print("FINISHED EVOLUTION OF POPULATION: ", i)
         # Average the results & report descent & best individual.
@@ -141,17 +142,17 @@ if __name__ == "__main__":
         len_logs.append(len)
         print("FINISHED EVOLUTION OF THRESHOLD: ", thresh)
     # Save related results for later evaluation
-    path = Path.cwd() / '..' / 'docs' / 'Data' / 'thresh-eval-best'
+    path = Path.cwd() / '..' / 'docs' / 'Data' / str('thresh-eval-best-'+sys.argv[1])
     np.save(path, thresh_logs)
-    path = Path.cwd() / '..' / 'docs' / 'Data' / 'thresh-eval-balance'
+    path = Path.cwd() / '..' / 'docs' / 'Data' / str('thresh-eval-balance-'+sys.argv[1])
     np.save(path, bal_logs)
-    path = Path.cwd() / '..' / 'docs' / 'Data' / 'thresh-eval-tsAvg'
+    path = Path.cwd() / '..' / 'docs' / 'Data' / str('thresh-eval-tsAvg-'+sys.argv[1])
     np.save(path, avg_logs)
-    path = Path.cwd() / '..' / 'docs' / 'Data' / 'thresh-eval-tsMed'
+    path = Path.cwd() / '..' / 'docs' / 'Data' / str('thresh-eval-tsMed-'+sys.argv[1])
     np.save(path, med_logs)
-    path = Path.cwd() / '..' / 'docs' / 'Data' / 'thresh-eval-tsMax'
+    path = Path.cwd() / '..' / 'docs' / 'Data' / str('thresh-eval-tsMax-'+sys.argv[1])
     np.save(path, max_logs)
-    path = Path.cwd() / '..' / 'docs' / 'Data' / 'thresh-eval-tsLen'
+    path = Path.cwd() / '..' / 'docs' / 'Data' / str('thresh-eval-tsLen-'+sys.argv[1])
     np.save(path, len_logs)
 
     # draw_threshold_descents(thresh_logs, measure='best', method='TTSGP', metric='complexity', fname='thresholddescent')
