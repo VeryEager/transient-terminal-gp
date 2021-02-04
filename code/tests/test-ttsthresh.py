@@ -123,7 +123,7 @@ if __name__ == "__main__":
 
             # Perform Evolution using Seed
             ttgp.__set_transient_threshold(thresh)
-            _best, _log = ttgp.evolve(train_data, train_target, dataset.columns.drop([target]), test_data, test_target)
+            _log, _best, _time = ttgp.evolve(train_data, train_target, dataset.columns.drop([target]), test_data, test_target)
             tts_log.append(_log)
             print("FINISHED EVOLUTION OF POPULATION: ", i)
         # Average the results & report descent & best individual.
@@ -140,10 +140,23 @@ if __name__ == "__main__":
         len = ts.average_singular_results(tts_log, 'tsLen')
         len_logs.append(len)
         print("FINISHED EVOLUTION OF THRESHOLD: ", thresh)
-    # Here reference the drawing of both complexity & accuracy measures
-    draw_threshold_descents(thresh_logs, measure='best', method='TTSGP', metric='complexity', fname='thresholddescent')
-    draw_threshold_descents(thresh_logs, measure='best', method='TTSGP', metric='accuracy', fname='thresholddescent')
-    draw_threshold_descents(bal_logs, measure='balanced', method='TTSGP', metric='complexity', fname='thresholddescent')
-    draw_threshold_descents(bal_logs, measure='balanced', method='TTSGP', metric='accuracy', fname='thresholddescent')
-    draw_threshold_tts_effect(avg_logs, "tsAvg"), draw_threshold_tts_effect(med_logs, "tsMed")
-    draw_threshold_tts_effect(max_logs, "tsMax"), draw_threshold_tts_effect(len_logs, "tsLen")
+    # Save related results for later evaluation
+    path = Path.cwd() / '..' / 'docs' / 'Data' / 'thresh-eval-best'
+    np.save(path, thresh_logs)
+    path = Path.cwd() / '..' / 'docs' / 'Data' / 'thresh-eval-balance'
+    np.save(path, bal_logs)
+    path = Path.cwd() / '..' / 'docs' / 'Data' / 'thresh-eval-tsAvg'
+    np.save(path, avg_logs)
+    path = Path.cwd() / '..' / 'docs' / 'Data' / 'thresh-eval-tsMed'
+    np.save(path, med_logs)
+    path = Path.cwd() / '..' / 'docs' / 'Data' / 'thresh-eval-tsMax'
+    np.save(path, max_logs)
+    path = Path.cwd() / '..' / 'docs' / 'Data' / 'thresh-eval-tsLen'
+    np.save(path, len_logs)
+
+    # draw_threshold_descents(thresh_logs, measure='best', method='TTSGP', metric='complexity', fname='thresholddescent')
+    # draw_threshold_descents(thresh_logs, measure='best', method='TTSGP', metric='accuracy', fname='thresholddescent')
+    # draw_threshold_descents(bal_logs, measure='balanced', method='TTSGP', metric='complexity', fname='thresholddescent')
+    # draw_threshold_descents(bal_logs, measure='balanced', method='TTSGP', metric='accuracy', fname='thresholddescent')
+    # draw_threshold_tts_effect(avg_logs, "tsAvg"), draw_threshold_tts_effect(med_logs, "tsMed")
+    # draw_threshold_tts_effect(max_logs, "tsMax"), draw_threshold_tts_effect(len_logs, "tsLen")

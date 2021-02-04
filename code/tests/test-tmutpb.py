@@ -116,7 +116,7 @@ if __name__ == "__main__":
             test_target = test[target].values
 
             # Perform Evolution using Seed
-            _best, _log = ttgp.evolve(train_data, train_target, dataset.columns.drop([target]), test_data, test_target,
+            _log, _best, _time = ttgp.evolve(train_data, train_target, dataset.columns.drop([target]), test_data, test_target,
                                       cxpb=(0.8-(prob-0.1)), tmutpb=prob)
             tts_log.append(_log)
             tts_best.append(_best)
@@ -126,6 +126,13 @@ if __name__ == "__main__":
         averaged = ts.average_results(tts_log, 'best')
         print("FINISHED EVALUATION OF tmutpb: ", prob)
         prob_logs.append(averaged)
-    draw_mutation_descents(prob_logs, measure='best', method='TTSGP', metric='complexity', fname='mutationdescent')
-    draw_mutation_descents(prob_logs, measure='best', method='TTSGP', metric='accuracy', fname='mutationdescent')
-    draw_time_ascent(time_logs, _range)
+
+    # Save results for later evaluation
+    path = Path.cwd() / '..' / 'docs' / 'Data' / 'tmutpb-eval-best'
+    np.save(path, prob_logs)
+    path = Path.cwd() / '..' / 'docs' / 'Data' / 'tmutpb-eval-time'
+    np.save(path, time_logs)
+
+    # draw_mutation_descents(prob_logs, measure='best', method='TTSGP', metric='complexity', fname='mutationdescent')
+    # draw_mutation_descents(prob_logs, measure='best', method='TTSGP', metric='accuracy', fname='mutationdescent')
+    # draw_time_ascent(time_logs, _range)
