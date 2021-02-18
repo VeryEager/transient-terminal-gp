@@ -70,6 +70,9 @@ if __name__ == "__main__":
         print("FINISHED EVOLUTION OF GENERATION: ", i)
 
     # Average and save results in data file for best, besttrain, and balanced (on condition)
+    path = Path.cwd() / '..' / 'docs' / 'Data' / str(sys.argv[1]+"-"+sys.argv[4]+"-raw-g"+sys.argv[5]+'-p'+sys.argv[6])
+    np.save(path, tts_log)
+
     best = ts.average_results(tts_log, 'best')
     path = Path.cwd() / '..' / 'docs' / 'Data' / str(sys.argv[1]+"-"+sys.argv[4]+"-best-g"+sys.argv[5]+'-p'+sys.argv[6])
     np.save(path, best)  # Save the results for later visualization
