@@ -1,6 +1,11 @@
 \BOOKMARK [1][-]{section.1}{Introduction}{}% 1
-\BOOKMARK [1][-]{section.2}{Previous Research}{}% 2
+\BOOKMARK [1][-]{section.2}{Previous Research in Interpretable AI}{}% 2
 \BOOKMARK [1][-]{section.3}{Transient Terminal Set GP}{}% 3
-\BOOKMARK [1][-]{section.4}{Experiment Design}{}% 4
-\BOOKMARK [1][-]{section.5}{Results}{}% 5
-\BOOKMARK [1][-]{section.6}{Conclusion}{}% 6
+\BOOKMARK [1][-]{section.4}{Experiment Methodology}{}% 4
+\BOOKMARK [2][-]{subsection.4.1}{Experiment Design}{section.4}% 5
+\BOOKMARK [2][-]{subsection.4.2}{Datasets}{section.4}% 6
+\BOOKMARK [2][-]{subsection.4.3}{TTSGP Parameter Experiments}{section.4}% 7
+\BOOKMARK [1][-]{section.5}{Results \046 Discussion}{}% 8
+\BOOKMARK [2][-]{subsection.5.1}{Parameter Experiment Results}{section.5}% 9
+\BOOKMARK [2][-]{subsection.5.2}{Evaluation Experiment Results}{section.5}% 10
+\BOOKMARK [1][-]{section.6}{Conclusions}{}% 11
