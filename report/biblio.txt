@@ -1,0 +1,17 @@
+@article{1,
+    author = "R. M. Filho, A. Lacerda, G. L. Pappa",
+    title = "Explaining Symbolic Regression Predictions",
+    journal = "2020 IEEE Congress on Evolutionary Computation (CEC)",
+    pages = "1-8",
+    year = "2020",
+    DOI = "10.1109/CEC48606.2020.9185683"
+}
+
+@article{2,
+    author = "M. Kommenda G. Kronberger M. Affenzeller S.M. Winkler B. Burlacu",
+    title = "Evolving Simple Symbolic Regression Models by Multi-Objective Genetic Programming",
+    journal = "Genetic Programming Theory and Practice XIII",
+    pages = "1-19",
+    year = "2016",
+    DOI = "10.1007/978-3-319-34223-8_1"
+}
