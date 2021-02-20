@@ -15,3 +15,31 @@
     year = "2016",
     DOI = "10.1007/978-3-319-34223-8_1"
 }
+
+@article{3,
+    author = "I. Icke, A. Rosenberg",
+    title = "Multi-objective Genetic Programming for Visual Analytics",
+    journal = "2011 European Conference on Genetic Programming",
+    pages = "322-334",
+    year = "2011",
+    DOI = "10.1007/978-3-642-20407-4_28"
+}
+
+@article{4,
+    author = "L. A. Ferreira, F. G. Guimarães, R. Silva",
+    title = "Applying Genetic Programming to Improve Interpretability in Machine Learning Models",
+    journal = "2020 IEEE Congress on Evolutionary Computation (CEC)",
+    pages = "1-8",
+    year = "2020",
+    DOI = "10.1109/CEC48606.2020.9185620"
+}
+
+@article{5,
+    author = "H. Chen, Z. Y. Guo, H. B. Duan D. Ban",
+    title = "A Genetic Programming-Driven Data Fitting Method",
+    journal = "IEEE Access",
+    pages = "111448-111459",
+    year = "2020",
+	volume = "8",
+    DOI = "10.1109/ACCESS.2020.3002563"
+}

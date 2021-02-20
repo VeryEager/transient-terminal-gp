@@ -19,6 +19,33 @@
 
 \refsection{0}
   \datalist[entry]{ynt/global//global/global}
+    \entry{3}{article}{}
+      \name{author}{1}{}{%
+        {{hash=ebf5a7d3b1f1de6ac002c4c500e329cb}{%
+           family={I.\bibnamedelimi Icke},
+           familyi={I\bibinitperiod\bibinitdelim I\bibinitperiod},
+           given={A.\bibnamedelimi Rosenberg},
+           giveni={A\bibinitperiod\bibinitdelim R\bibinitperiod}}}%
+      }
+      \strng{namehash}{ebf5a7d3b1f1de6ac002c4c500e329cb}
+      \strng{fullhash}{ebf5a7d3b1f1de6ac002c4c500e329cb}
+      \strng{bibnamehash}{ebf5a7d3b1f1de6ac002c4c500e329cb}
+      \strng{authorbibnamehash}{ebf5a7d3b1f1de6ac002c4c500e329cb}
+      \strng{authornamehash}{ebf5a7d3b1f1de6ac002c4c500e329cb}
+      \strng{authorfullhash}{ebf5a7d3b1f1de6ac002c4c500e329cb}
+      \field{sortinit}{2}
+      \field{sortinithash}{ed39bb39cf854d5250e95b1c1f94f4ed}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{2011 European Conference on Genetic Programming}
+      \field{title}{Multi-objective Genetic Programming for Visual Analytics}
+      \field{year}{2011}
+      \field{pages}{322\bibrangedash 334}
+      \range{pages}{13}
+      \verb{doi}
+      \verb 10.1007/978-3-642-20407-4_28
+      \endverb
+    \endentry
     \entry{2}{article}{}
       \name{author}{1}{}{%
         {{hash=c652a2234ee1f16f960c9845fafda89f}{%
@@ -44,6 +71,65 @@
       \range{pages}{19}
       \verb{doi}
       \verb 10.1007/978-3-319-34223-8_1
+      \endverb
+    \endentry
+    \entry{5}{article}{}
+      \name{author}{1}{}{%
+        {{hash=28567498ca87e1a10a2d02983ef0559d}{%
+           family={H.\bibnamedelimi Chen},
+           familyi={H\bibinitperiod\bibinitdelim C\bibinitperiod},
+           given={H.\bibnamedelimi B.\bibnamedelimi Duan\bibnamedelimb D.\bibnamedelimi Ban},
+           giveni={H\bibinitperiod\bibinitdelim B\bibinitperiod\bibinitdelim D\bibinitperiod\bibinitdelim D\bibinitperiod\bibinitdelim B\bibinitperiod},
+           suffix={Z.\bibnamedelimi Y.\bibnamedelimi Guo},
+           suffixi={Z\bibinitperiod\bibinitdelim Y\bibinitperiod\bibinitdelim G\bibinitperiod}}}%
+      }
+      \strng{namehash}{28567498ca87e1a10a2d02983ef0559d}
+      \strng{fullhash}{28567498ca87e1a10a2d02983ef0559d}
+      \strng{bibnamehash}{28567498ca87e1a10a2d02983ef0559d}
+      \strng{authorbibnamehash}{28567498ca87e1a10a2d02983ef0559d}
+      \strng{authornamehash}{28567498ca87e1a10a2d02983ef0559d}
+      \strng{authorfullhash}{28567498ca87e1a10a2d02983ef0559d}
+      \field{sortinit}{2}
+      \field{sortinithash}{ed39bb39cf854d5250e95b1c1f94f4ed}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{IEEE Access}
+      \field{title}{A Genetic Programming-Driven Data Fitting Method}
+      \field{volume}{8}
+      \field{year}{2020}
+      \field{pages}{111448\bibrangedash 111459}
+      \range{pages}{12}
+      \verb{doi}
+      \verb 10.1109/ACCESS.2020.3002563
+      \endverb
+    \endentry
+    \entry{4}{article}{}
+      \name{author}{1}{}{%
+        {{hash=88bb4a2d1e7965a0650e8b295c7e3d81}{%
+           family={L.\bibnamedelimi A.\bibnamedelimi Ferreira},
+           familyi={L\bibinitperiod\bibinitdelim A\bibinitperiod\bibinitdelim F\bibinitperiod},
+           given={R.\bibnamedelimi Silva},
+           giveni={R\bibinitperiod\bibinitdelim S\bibinitperiod},
+           suffix={F.\bibnamedelimi G.\bibnamedelimi Guimarães},
+           suffixi={F\bibinitperiod\bibinitdelim G\bibinitperiod\bibinitdelim G\bibinitperiod}}}%
+      }
+      \strng{namehash}{88bb4a2d1e7965a0650e8b295c7e3d81}
+      \strng{fullhash}{88bb4a2d1e7965a0650e8b295c7e3d81}
+      \strng{bibnamehash}{88bb4a2d1e7965a0650e8b295c7e3d81}
+      \strng{authorbibnamehash}{88bb4a2d1e7965a0650e8b295c7e3d81}
+      \strng{authornamehash}{88bb4a2d1e7965a0650e8b295c7e3d81}
+      \strng{authorfullhash}{88bb4a2d1e7965a0650e8b295c7e3d81}
+      \field{sortinit}{2}
+      \field{sortinithash}{ed39bb39cf854d5250e95b1c1f94f4ed}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{2020 IEEE Congress on Evolutionary Computation (CEC)}
+      \field{title}{Applying Genetic Programming to Improve Interpretability in Machine Learning Models}
+      \field{year}{2020}
+      \field{pages}{1\bibrangedash 8}
+      \range{pages}{8}
+      \verb{doi}
+      \verb 10.1109/CEC48606.2020.9185620
       \endverb
     \endentry
     \entry{1}{article}{}

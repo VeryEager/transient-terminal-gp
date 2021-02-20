@@ -43,7 +43,7 @@ Multi-objective Genetic Programming (GP) has been another area of recent scholar
 A new multi-objective GP approach is proposed in this report which intends to further improve the interpretability of SR models, dubbed the Transient Terminal Set. The Transient Terminal Set aims to improve SR model interpretability by identifying the subtrees in a population which generated the greatest improvements to fitness and distributing these subtrees as terminals used during a third genetic operation called Transient Mutation. This process is hoped to improve the search process for optimal solutions, enabling faster convergence and the potential for a greater range of solutions within the Pareto front.
 
 \section{Previous Research in Interpretable AI}
-NOTE: This section will be written last.
+NOTE: This section will be written last.\cite{3}\cite{4}\cite{5}
 
 \section{Transient Terminal Set GP}
 The Transient Terminal Set seeks to improve the interpretability of Symbolic Regression models by tracking evolutionary improvements in the population across generations. When a candidate solution undergoes either regular crossover or mutation, the trans-generational fitness change is calculated. Should this reflect a Pareto improvement in the fitness values and result in a significant improvement in at least one fitness value (\textit{solution accuracy} or \textit{solution complexity}) the altered subtree of the candidate solution is added to the Transient Terminal Set.
@@ -84,7 +84,8 @@ Finally, the \textit{subtree threshold} quantifies the change in candidate solut
 		\EndIf
 		\EndFor 
 		\EndWhile
-\end{algorithmic}\end{algorithm*}
+	\end{algorithmic}
+\end{algorithm*}
 
 \section{Experiment Methodology}
 \subsection{Experiment Design}
@@ -178,8 +179,6 @@ Meanwhile, the subtree threshold experiment results indicate TTSGP may negativel
 			100&(0.772, 12.48)\\
 		\end{tabularx}
 	\end{center}
-\end{table}
-\begin{table}[H]
 	\begin{center}
 		\caption{TMUTPB Experiment Results (RMSE, tree size)}
 		\label{table:Z}
@@ -216,9 +215,12 @@ Future research can identify probable flaws and shortcomings with the current TT
 \end{enumerate}
 \medskip
 \printbibliography
-
+\onecolumn
+\appendix
+\appendixpage
 % BEGIN RESULT TABLES
-\begin{table*}[t]
+\section{Experiment Results}
+\begin{table}[!htb]
 	\begin{center}
 		\caption{Mean Best Solution at 50th generation (RMSE, tree size)}
 		\label{table:1}
@@ -235,8 +237,6 @@ Future research can identify probable flaws and shortcomings with the current TT
 			TTGP (g250, p200, th85, tm0.15) &(0.831, 7.72)&(0.916, 8.4)&(17.423, 9.8)&(8.319, 7.68)\\
 		\end{tabular}
 	\end{center}
-\end{table*}
-\begin{table*}[t]
 	\begin{center}
 		\caption{Training Accuracy of Mean Best Solution at 50th generation (RMSE)}
 		\label{table:2}
@@ -253,8 +253,6 @@ Future research can identify probable flaws and shortcomings with the current TT
 			TTGP (g250, p200, th85, tm0.15) &0.824&0.917&17.444&8.262\\
 		\end{tabular}
 	\end{center}
-\end{table*}
-\begin{table*}[t]
 	\begin{center}
 		\caption{Mean Balanced Solution at 50th generation (RMSE, tree size)}
 		\label{table:3}
@@ -269,8 +267,6 @@ Future research can identify probable flaws and shortcomings with the current TT
 			TTGP (g250, p200, th85, tm0.15) &(1.097, 3.24)&(1.065, 3.0)&(23.825, 3.2)&(9.671, 2.56)\\
 		\end{tabular}
 	\end{center}
-\end{table*}
-\begin{table*}[t]
 	\begin{center}
 		\caption{Mean Evolution Time (seconds)}
 		\label{table:4}
@@ -287,71 +283,47 @@ Future research can identify probable flaws and shortcomings with the current TT
 			TTGP (g250, p200, th85, tm0.15) &321.328&522.578&279.706&259.92\\
 		\end{tabular}
 	\end{center}
-\end{table*}
+\end{table}
 
 % BEGIN RESULT & DATA FIGURES
-\clearpage
-\begin{figure}[t]
+\twocolumn[\section{Experiment Figures}]
+\begin{figure}[!htb]
 	\caption{Red Wine Quality (g50 p500) Testing}
 	\includegraphics[width=0.40\textwidth]{Red Wine Quality (50 generations)-best-evo}
-\end{figure}
-\begin{figure}[t]
 	\caption{Red Wine Quality (g250 p200) Testing}
 	\includegraphics[width=0.40\textwidth]{Red Wine Quality (250 generations)-best-evo}
-\end{figure}
-\begin{figure}[t]
 	\caption{White Wine Quality (g50 p500) Testing}
 	\includegraphics[width=0.40\textwidth]{White Wine Quality (50 generations)-best-evo}
-\end{figure}
-\begin{figure}[t]
 	\caption{White Wine Quality (g250 p200) Testing}
 	\includegraphics[width=0.40\textwidth]{White Wine Quality (250 generations)-best-evo}
 \end{figure}
-\begin{figure}[t]
+\begin{figure}[!htb]
 	\caption{Red Wine Quality (g50 p500) Training}
 	\includegraphics[width=0.40\textwidth]{Red Wine Quality (50 generations)-besttrain-evo}
-\end{figure}
-\begin{figure}[t]
 	\caption{Red Wine Quality (g250 p200) Training}
 	\includegraphics[width=0.40\textwidth]{Red Wine Quality (250 generations)-besttrain-evo}
-\end{figure}
-\begin{figure}[t]
 	\caption{White Wine Quality (g50 p500) Training}
 	\includegraphics[width=0.40\textwidth]{White Wine Quality (50 generations)-besttrain-evo}
-\end{figure}
-\begin{figure}[t]
 	\caption{White Wine Quality (g250 p200) Training}
 	\includegraphics[width=0.40\textwidth]{White Wine Quality (250 generations)-besttrain-evo}
 \end{figure}
-\begin{figure}[t]
+\begin{figure}[!htb]
 	\caption{Concrete Strength (g50 p500) Testing}
 	\includegraphics[width=0.40\textwidth]{Concrete Strength (50 generations)-best-evo}
-\end{figure}
-\begin{figure}[t]
 	\caption{Concrete Strength (g250 p200) Testing}
 	\includegraphics[width=0.40\textwidth]{Concrete Strength (250 generations)-best-evo}
-\end{figure}
-\begin{figure}[t]
 	\caption{Boston House Price (g50 p500) Testing}
 	\includegraphics[width=0.40\textwidth]{Boston House Price (50 generations)-best-evo}
-\end{figure}
-\begin{figure}[t]
 	\caption{Boston House Price (g250 p200) Testing}
 	\includegraphics[width=0.40\textwidth]{Boston House Price (250 generations)-best-evo}
 \end{figure}
-\begin{figure}[t]
+\begin{figure}[!htb]
 	\caption{Concrete Strength (g50 p500) Training}
 	\includegraphics[width=0.40\textwidth]{Concrete Strength (50 generations)-besttrain-evo}
-\end{figure}
-\begin{figure}[t]
 	\caption{Concrete Strength (g250 p200) Training}
 	\includegraphics[width=0.40\textwidth]{Concrete Strength (250 generations)-besttrain-evo}
-\end{figure}
-\begin{figure}[t]
 	\caption{Boston House Price (g50 p500) Training}
 	\includegraphics[width=0.40\textwidth]{Boston House Price (50 generations)-besttrain-evo}
-\end{figure}
-\begin{figure}[t]
 	\caption{Boston House Price (g250 p200) Training}
 	\includegraphics[width=0.40\textwidth]{Boston House Price (250 generations)-besttrain-evo}
 \end{figure}
