@@ -2352,8 +2352,8 @@
   <bcf:section number="0">
     <bcf:citekey order="1">1</bcf:citekey>
     <bcf:citekey order="2">2</bcf:citekey>
-    <bcf:citekey order="3">3</bcf:citekey>
-    <bcf:citekey order="4">4</bcf:citekey>
+    <bcf:citekey order="3">4</bcf:citekey>
+    <bcf:citekey order="4">3</bcf:citekey>
     <bcf:citekey order="5">5</bcf:citekey>
   </bcf:section>
   <!-- SORTING TEMPLATES -->
